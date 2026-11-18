@@ -231,20 +231,59 @@ const App = {
   switchLoginTab(tab) {
     const adminTab = document.getElementById('login-tab-admin');
     const employeeTab = document.getElementById('login-tab-employee');
+    const registerTab = document.getElementById('login-tab-register');
     const adminPanel = document.getElementById('login-panel-admin');
     const employeePanel = document.getElementById('login-panel-employee');
+    const registerPanel = document.getElementById('login-panel-register');
 
-    if (tab === 'admin') {
-      adminTab.classList.add('active');
-      employeeTab.classList.remove('active');
-      adminPanel.style.display = 'block';
-      employeePanel.style.display = 'none';
-    } else {
-      adminTab.classList.remove('active');
-      employeeTab.classList.add('active');
-      adminPanel.style.display = 'none';
-      employeePanel.style.display = 'block';
+    if (adminTab) adminTab.classList.toggle('active', tab === 'admin');
+    if (employeeTab) employeeTab.classList.toggle('active', tab === 'employee');
+    if (registerTab) registerTab.classList.toggle('active', tab === 'register');
+
+    if (adminPanel) adminPanel.style.display = (tab === 'admin') ? 'block' : 'none';
+    if (employeePanel) employeePanel.style.display = (tab === 'employee') ? 'block' : 'none';
+    if (registerPanel) registerPanel.style.display = (tab === 'register') ? 'block' : 'none';
+
+    if (tab === 'employee') {
       this.resetPin();
+    }
+  },
+
+  async handleRegister(e) {
+    if (e) e.preventDefault();
+    const full_name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const role = document.getElementById('reg-role').value;
+    const pin = document.getElementById('reg-pin').value.trim();
+    const password = document.getElementById('reg-password').value;
+
+    if (!full_name || !email || !password) {
+      this.showToast('Please fill in your name, email, and password.', 'warning');
+      return;
+    }
+
+    if (password.length < 6) {
+      this.showToast('Password must be at least 6 characters long.', 'warning');
+      return;
+    }
+
+    try {
+      const res = await Api.post('/auth/register', {
+        full_name,
+        email,
+        phone,
+        role,
+        pin: pin || undefined,
+        password
+      });
+
+      Api.setAuth(res.token, res.user);
+      this.currentUser = res.user;
+      this.showToast(res.message, 'success');
+      this.showAppShell();
+    } catch (err) {
+      this.showToast(err.message, 'error');
     }
   },
 

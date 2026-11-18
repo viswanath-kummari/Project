@@ -121,5 +121,49 @@ class FreshCutSystemTest(unittest.TestCase):
         self.assertEqual(latest_mov['movement_type'], 'PURCHASE')
         self.assertEqual(latest_mov['quantity'], increment_amount)
 
+    def test_07_user_registration_and_signup(self):
+        import time
+        unique_email = f"manager_{int(time.time())}@freshcut.com"
+
+        # 1. Reject short password
+        short_res = self.client.post('/api/auth/register', json={
+            'full_name': 'New Manager',
+            'email': unique_email,
+            'password': '123'
+        })
+        self.assertEqual(short_res.status_code, 400)
+
+        # 2. Valid Registration
+        reg_res = self.client.post('/api/auth/register', json={
+            'full_name': 'Viswanath Store Owner',
+            'email': unique_email,
+            'password': 'SecureStorePass2026!',
+            'role': 'admin',
+            'pin': '7788',
+            'phone': '+91 98765 43210'
+        })
+        self.assertEqual(reg_res.status_code, 201)
+        data = reg_res.get_json()
+        self.assertIn('token', data)
+        self.assertEqual(data['user']['email'], unique_email)
+        self.assertEqual(data['user']['role'], 'admin')
+
+        # 3. Reject duplicate registration
+        dup_res = self.client.post('/api/auth/register', json={
+            'full_name': 'Duplicate User',
+            'email': unique_email,
+            'password': 'SecureStorePass2026!'
+        })
+        self.assertEqual(dup_res.status_code, 400)
+
+        # 4. Sign in with newly registered credentials
+        login_res = self.client.post('/api/auth/login', json={
+            'email': unique_email,
+            'password': 'SecureStorePass2026!'
+        })
+        self.assertEqual(login_res.status_code, 200)
+        login_data = login_res.get_json()
+        self.assertEqual(login_data['user']['email'], unique_email)
+
 if __name__ == '__main__':
     unittest.main()

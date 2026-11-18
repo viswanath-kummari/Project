@@ -89,6 +89,9 @@
           <button id="login-tab-employee" class="login-role-btn" onclick="App.switchLoginTab('employee')">
             <i class="bi bi-person-badge-fill"></i> Cashier PIN
           </button>
+          <button id="login-tab-register" class="login-role-btn" onclick="App.switchLoginTab('register')">
+            <i class="bi bi-person-plus-fill"></i> Register / Sign Up
+          </button>
         </div>
 
         <!-- 1. Administrator Login Form -->
@@ -120,7 +123,7 @@
             </button>
           </form>
 
-          <div class="demo-chip-box">
+          <div class="demo-chip-box mb-3">
             <div>
               <div class="small fw-bold text-dark">Demo Admin Account</div>
               <div class="small text-muted font-monospace">admin@freshcut.com</div>
@@ -128,6 +131,13 @@
             <button class="btn btn-sm btn-outline-danger" onclick="App.quickDemoLogin('admin')">
               1-Click Fill
             </button>
+          </div>
+
+          <div class="text-center pt-2 border-top">
+            <span class="text-muted small">Need a new store account? </span>
+            <a href="javascript:void(0)" class="small fw-bold text-danger text-decoration-none" onclick="App.switchLoginTab('register')">
+              Sign Up / Register Here &rarr;
+            </a>
           </div>
         </div>
 
@@ -162,7 +172,7 @@
             <button type="button" class="pin-key-btn text-secondary" onclick="App.pinBackspace()"><i class="bi bi-backspace"></i></button>
           </div>
 
-          <div class="demo-chip-box">
+          <div class="demo-chip-box mb-3">
             <div>
               <div class="small fw-bold text-dark">Demo Cashier Account</div>
               <div class="small text-muted font-monospace">PIN: 5678 (Aarav Sharma)</div>
@@ -170,6 +180,84 @@
             <button class="btn btn-sm btn-outline-success" onclick="App.quickDemoLogin('employee')">
               1-Click PIN Fill
             </button>
+          </div>
+
+          <div class="text-center pt-2 border-top">
+            <span class="text-muted small">New employee? </span>
+            <a href="javascript:void(0)" class="small fw-bold text-success text-decoration-none" onclick="App.switchLoginTab('register')">
+              Register New Profile &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- 3. Register / Sign Up Form -->
+        <div id="login-panel-register" style="display: none;">
+          <div class="mb-3">
+            <h4 class="fw-bold mb-1">Create Account / Sign Up</h4>
+            <div class="text-muted small">Register a new store owner, manager or staff cashier profile.</div>
+          </div>
+
+          <form onsubmit="App.handleRegister(event)">
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted mb-1">Full Name:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                  <input type="text" id="reg-name" class="form-control border-start-0" placeholder="e.g. Viswanath Kummari" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted mb-1">Phone Number:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
+                  <input type="tel" id="reg-phone" class="form-control border-start-0" placeholder="+91 98765 43210">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small fw-bold text-muted mb-1">Email Address:</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                <input type="email" id="reg-email" class="form-control border-start-0" placeholder="name@freshcut.com" required>
+              </div>
+            </div>
+
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted mb-1">Account Role:</label>
+                <select id="reg-role" class="form-select">
+                  <option value="admin">Store Owner / Manager</option>
+                  <option value="employee">Cashier / Staff Member</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted mb-1">4-Digit POS PIN:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-grid-3x3-gap text-muted"></i></span>
+                  <input type="text" id="reg-pin" class="form-control border-start-0 font-monospace" maxlength="4" placeholder="e.g. 7788">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted mb-1">Password:</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                <input type="password" id="reg-password" class="form-control border-start-0" placeholder="Min. 6 characters" minlength="6" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-emerald w-100 py-2 fs-6 mb-3 shadow-sm">
+              <i class="bi bi-person-check-fill me-1"></i> Sign Up & Start Session
+            </button>
+          </form>
+
+          <div class="text-center pt-2 border-top">
+            <span class="text-muted small">Already registered? </span>
+            <a href="javascript:void(0)" class="small fw-bold text-danger text-decoration-none" onclick="App.switchLoginTab('admin')">
+              Sign In to Your Account &rarr;
+            </a>
           </div>
         </div>
       </div>
