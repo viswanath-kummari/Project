@@ -12,6 +12,7 @@ class FreshCutSystemTest(unittest.TestCase):
         data = res.get_json()
         self.assertIn('token', data)
         self.assertEqual(data['user']['role'], 'admin')
+        self.assertEqual(data['user']['full_name'], 'Viswanath')
 
     def test_02_employee_pin_login(self):
         res = self.client.post('/api/auth/login', json={'pin': '5678'})

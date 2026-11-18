@@ -43,7 +43,7 @@ def seed_database_if_empty():
     admin_user = Profile(
         email='admin@freshcut.com',
         password_hash=hash_password('AdminPassword123!'),
-        full_name='Vikram Rathore',
+        full_name='Viswanath',
         role='admin',
         pin='1234',
         phone='+91 98765 00001',
