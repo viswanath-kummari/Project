@@ -19,6 +19,7 @@ class FreshCutSystemTest(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertEqual(data['user']['role'], 'employee')
+        self.assertEqual(data['user']['full_name'], 'Hemanth')
 
     def test_03_rbac_enforcement(self):
         # 1. Log in as employee

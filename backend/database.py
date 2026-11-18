@@ -53,7 +53,7 @@ def seed_database_if_empty():
     employee_user = Profile(
         email='cashier@freshcut.com',
         password_hash=hash_password('CashierPassword123!'),
-        full_name='Aarav Sharma',
+        full_name='Hemanth',
         role='employee',
         pin='5678',
         phone='+91 98765 00002',
