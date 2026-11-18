@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fresh Cut Meat Shop Management System</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS & Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Application Stylesheets -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/animations.css">
+  <link rel="stylesheet" href="/static/css/pos.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <div id="app-wrapper">
+    <!-- ======================================================================
+         SIDEBAR NAVIGATION
+         ====================================================================== -->
+    <aside id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon-box">
+          <i class="bi bi-shield-shaded"></i>
+        </div>
+        <div>
+          <h2 class="brand-title">FRESH CUT</h2>
+          <div class="brand-subtitle">Artisanal Meats Co.</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Operations</div>
+        <a href="#dashboard" class="sidebar-link active" data-view="dashboard">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#pos" class="sidebar-link" data-view="pos">
+          <i class="bi bi-cart-check-fill"></i>
+          <span>POS Billing</span>
+          <span class="sidebar-badge bg-danger text-white">Live</span>
+        </a>
+        <a href="#inventory" class="sidebar-link" data-view="inventory">
+          <i class="bi bi-box-seam-fill"></i>
+          <span>Inventory & Stock</span>
+        </a>
+        <a href="#products" class="sidebar-link" data-view="products">
+          <i class="bi bi-tags-fill"></i>
+          <span>Products & Cuts</span>
+        </a>
+        <a href="#customers" class="sidebar-link" data-view="customers">
+          <i class="bi bi-people-fill"></i>
+          <span>Customers</span>
+        </a>
+
+        <!-- Admin Only Sections -->
+        <div class="nav-section-title admin-only">Management & Finance</div>
+        <a href="#suppliers" class="sidebar-link admin-only" data-view="suppliers">
+          <i class="bi bi-truck"></i>
+          <span>Suppliers & Intake</span>
+        </a>
+        <a href="#expenses" class="sidebar-link admin-only" data-view="expenses">
+          <i class="bi bi-cash-stack"></i>
+          <span>Expenses</span>
+        </a>
+        <a href="#reports" class="sidebar-link admin-only" data-view="reports">
+          <i class="bi bi-bar-chart-line-fill"></i>
+          <span>Reports & Analytics</span>
+        </a>
+        <a href="#employees" class="sidebar-link admin-only" data-view="employees">
+          <i class="bi bi-person-badge-fill"></i>
+          <span>Staff Accounts</span>
+        </a>
+
+        <div class="nav-section-title admin-only">System & Security</div>
+        <a href="#settings" class="sidebar-link admin-only" data-view="settings">
+          <i class="bi bi-gear-fill"></i>
+          <span>Store Settings</span>
+        </a>
+        <a href="#audit" class="sidebar-link admin-only" data-view="audit">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>Audit Logs</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar User Profile -->
+      <div class="sidebar-user">
+        <div class="user-avatar" id="header-user-avatar">A</div>
+        <div class="flex-grow-1 overflow-hidden">
+          <div class="fw-bold text-white text-truncate small" id="header-user-name">Vikram Rathore</div>
+          <div class="text-muted" style="font-size: 0.72rem;" id="header-user-role">ADMINISTRATOR</div>
+        </div>
+        <span class="badge bg-danger text-uppercase" id="current-role-badge" style="font-size: 0.68rem;">ADMIN</span>
+      </div>
+    </aside>
+
+    <!-- ======================================================================
+         MAIN APPLICATION CONTENT
+         ====================================================================== -->
+    <main id="main-content">
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <div class="d-flex align-items-center gap-3">
+          <button id="sidebar-toggle" class="btn btn-sm btn-light d-lg-none" aria-label="Toggle Navigation">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success-subtle text-success border border-success d-none d-md-inline-flex align-items-center gap-1">
+              <span class="spinner-grow spinner-grow-sm" role="status"></span>
+              Supabase Ready &bull; Offline Resilient
+            </span>
+            <span class="text-muted small d-none d-xl-inline">| Enterprise Retail Release 1.1</span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- 1-Click Role Switcher for Demo Evaluation -->
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-danger dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-gear me-1"></i> Switch Demo Role
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><h6 class="dropdown-header">Test Role-Based Access Control</h6></li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-switch-role="admin">
+                  <span class="badge bg-danger">ADMIN</span>
+                  <div>
+                    <div class="fw-semibold">Vikram Rathore (Owner)</div>
+                    <small class="text-muted">Full access to P&L, staff, expenses</small>
+                  </div>
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-switch-role="employee">
+                  <span class="badge bg-success">CASHIER</span>
+                  <div>
+                    <div class="fw-semibold">Aarav Sharma (Staff)</div>
+                    <small class="text-muted">POS Billing, catalog view only</small>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <button class="btn btn-meat-primary btn-sm btn-pop" onclick="App.navigateTo('pos')">
+            <i class="bi bi-cart-plus-fill"></i> New Sale
+          </button>
+        </div>
+      </header>
+
+      <!-- Dynamic Page Container -->
+      <div class="page-container">
+
+        <!-- ==================================================================
+             1. DASHBOARD VIEW
+             ================================================================== -->
+        <section id="view-dashboard" class="view-section">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Operations Dashboard</h2>
+              <div class="text-muted small">Live retail telemetry, sales performance and stock alerts.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-secondary" onclick="DashboardModule.load()">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+              <div class="stat-card interactive-card" onclick="App.navigateTo('pos')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title">Today's Sales</div>
+                  <div class="stat-icon-wrapper icon-red">
+                    <i class="bi bi-cash icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num" id="kpi-today-sales">₹ 0.00</div>
+                <div class="stat-trend trend-up">
+                  <i class="bi bi-arrow-up-right"></i> Active Shift
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="stat-card interactive-card" onclick="App.navigateTo('inventory')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title">Available Stock</div>
+                  <div class="stat-icon-wrapper icon-green">
+                    <i class="bi bi-box2-heart icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num"><span id="kpi-stock-kg">0.00</span> <small class="fs-6">KG</small></div>
+                <div class="stat-trend trend-up">
+                  <i class="bi bi-check-circle"></i> In Cold Storage
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="stat-card interactive-card" onclick="App.navigateTo('inventory')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title">Low Stock Alerts</div>
+                  <div class="stat-icon-wrapper icon-amber">
+                    <i class="bi bi-exclamation-triangle-fill icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num text-danger" id="kpi-low-stock">0</div>
+                <div class="stat-trend trend-down">
+                  <i class="bi bi-bell-fill"></i> Minimum threshold alerts
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="stat-card interactive-card">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title">Total Invoices</div>
+                  <div class="stat-icon-wrapper icon-blue">
+                    <i class="bi bi-receipt icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num" id="kpi-total-bills">0</div>
+                <div class="stat-trend trend-up">
+                  <i class="bi bi-shield-check"></i> Completed Orders
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Profit KPIs (Admin Only) -->
+            <div class="col-6 col-lg-4" id="kpi-gross-profit-card">
+              <div class="stat-card interactive-card border-success" onclick="App.navigateTo('reports')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title text-success">Gross Profit (Rev - COGS)</div>
+                  <div class="stat-icon-wrapper icon-green">
+                    <i class="bi bi-graph-up-arrow icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num text-success" id="kpi-gross-profit">₹ 0.00</div>
+                <div class="stat-trend trend-up">Excludes Operating Overhead</div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-4" id="kpi-expenses-card">
+              <div class="stat-card interactive-card border-warning" onclick="App.navigateTo('expenses')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title text-warning-emphasis">Operating Expenses</div>
+                  <div class="stat-icon-wrapper icon-amber">
+                    <i class="bi bi-lightning-charge-fill icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num text-warning-emphasis" id="kpi-total-expenses">₹ 0.00</div>
+                <div class="stat-trend text-muted">Utilities, Packaging & Wages</div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-4" id="kpi-net-result-card">
+              <div class="stat-card interactive-card border-primary" onclick="App.navigateTo('reports')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="stat-title text-primary">Net Operating Result</div>
+                  <div class="stat-icon-wrapper icon-purple">
+                    <i class="bi bi-wallet2 icon-animate-hover"></i>
+                  </div>
+                </div>
+                <div class="stat-value mono-num text-primary" id="kpi-net-result">₹ 0.00</div>
+                <div class="stat-trend trend-up">EBITDA (Gross - Ops - Spoilage)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+              <div class="content-card">
+                <div class="card-header-flex">
+                  <div>
+                    <h5 class="mb-1">Sales & Operating Trends (7 Days)</h5>
+                    <div class="text-muted small">Daily revenue progression with operating overhead</div>
+                  </div>
+                  <span class="badge bg-light text-dark border">Live Telemetry</span>
+                </div>
+                <div style="height: 280px;">
+                  <canvas id="dashboardTrendChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="content-card">
+                <div class="card-header-flex">
+                  <div>
+                    <h5 class="mb-1">Volume by Category</h5>
+                    <div class="text-muted small">Revenue distribution by cut</div>
+                  </div>
+                </div>
+                <div style="height: 280px; position: relative;">
+                  <canvas id="dashboardCategoryChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Transactions Table -->
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div>
+                <h5 class="mb-1">Recent Invoices & Transactions</h5>
+                <div class="text-muted small">Latest sales billed in current shop session</div>
+              </div>
+              <button class="btn btn-sm btn-meat-secondary" onclick="App.navigateTo('pos')">
+                Go to Billing Counter &rarr;
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Invoice No</th>
+                    <th>Customer</th>
+                    <th>Payment Method</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-sales-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             2. POS BILLING VIEW
+             ================================================================== -->
+        <section id="view-pos" class="view-section" style="display: none;">
+          <div class="pos-container">
+            <!-- Left: Catalog & Search -->
+            <div class="pos-catalog-panel">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="header-search flex-grow-1 me-3">
+                  <i class="bi bi-search"></i>
+                  <input type="text" placeholder="Search meat cut, SKU or name..." oninput="PosModule.searchProducts(this.value)">
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="CustomersModule.openAddModal()" title="Add Customer">
+                  <i class="bi bi-person-plus-fill"></i> New Customer
+                </button>
+              </div>
+
+              <!-- Category Pills -->
+              <div class="pos-categories" id="pos-category-tabs">
+                <!-- Injected via pos.js -->
+              </div>
+
+              <!-- Product Cards Grid -->
+              <div class="pos-products-grid" id="pos-products-grid">
+                <!-- Injected via pos.js -->
+              </div>
+            </div>
+
+            <!-- Right: POS Active Cart Pane -->
+            <div class="pos-cart-panel">
+              <div class="cart-header">
+                <div>
+                  <h6 class="mb-0 fw-bold">Active Bill</h6>
+                  <small class="text-muted" id="cart-items-count">0 items</small>
+                </div>
+                <button class="btn btn-sm btn-link text-danger p-0 fw-bold" onclick="PosModule.clearCart()">
+                  Clear Cart
+                </button>
+              </div>
+
+              <!-- Customer Selector -->
+              <div class="p-3 border-bottom bg-white">
+                <label class="form-label small fw-bold text-muted mb-1">Customer Profile:</label>
+                <select class="form-select form-select-sm" id="pos-customer-select">
+                  <option value="">Walk-in Customer</option>
+                </select>
+              </div>
+
+              <!-- Virtual Weight Scale Presets -->
+              <div class="weight-presets-bar">
+                <span class="small text-muted align-self-center me-1">Scale Dial:</span>
+                <button class="preset-chip" onclick="PosModule.applyWeightPreset(0.250)">0.25 kg</button>
+                <button class="preset-chip" onclick="PosModule.applyWeightPreset(0.500)">0.50 kg</button>
+                <button class="preset-chip" onclick="PosModule.applyWeightPreset(0.750)">0.75 kg</button>
+                <button class="preset-chip" onclick="PosModule.applyWeightPreset(1.000)">1.00 kg</button>
+                <button class="preset-chip" onclick="PosModule.applyWeightPreset(1.500)">1.50 kg</button>
+              </div>
+
+              <!-- Items Scroll Area -->
+              <div class="cart-items-scroll" id="pos-cart-items">
+                <!-- Items populated here -->
+              </div>
+
+              <!-- Financial Totals Breakdown -->
+              <div class="cart-summary">
+                <div class="cart-summary-line">
+                  <span>Subtotal:</span>
+                  <span class="mono-num fw-semibold" id="cart-subtotal">₹0.00</span>
+                </div>
+                <div class="cart-summary-line">
+                  <span class="text-primary cursor-pointer" onclick="PosModule.promptDiscount()">
+                    <i class="bi bi-tag-fill me-1"></i> Discount (-):
+                  </span>
+                  <span class="mono-num text-primary" id="cart-discount">₹0.00</span>
+                </div>
+                <div class="cart-summary-line">
+                  <span>GST (5% Configured):</span>
+                  <span class="mono-num" id="cart-tax">₹0.00</span>
+                </div>
+                <div class="cart-summary-line grand-total">
+                  <span>Grand Total:</span>
+                  <span class="mono-num text-danger" id="cart-grand-total">₹0.00</span>
+                </div>
+
+                <!-- Payment Method Buttons -->
+                <div class="cart-payment-methods">
+                  <button class="pay-btn-mode active" data-method="CASH" onclick="PosModule.setPaymentMethod('CASH')">
+                    <i class="bi bi-cash"></i> Cash
+                  </button>
+                  <button class="pay-btn-mode" data-method="UPI" onclick="PosModule.setPaymentMethod('UPI')">
+                    <i class="bi bi-qr-code"></i> UPI / QR
+                  </button>
+                  <button class="pay-btn-mode" data-method="CARD" onclick="PosModule.setPaymentMethod('CARD')">
+                    <i class="bi bi-credit-card-2-front"></i> Card
+                  </button>
+                  <button class="pay-btn-mode" data-method="CREDIT" onclick="PosModule.setPaymentMethod('CREDIT')">
+                    <i class="bi bi-clock-history"></i> Store Credit
+                  </button>
+                </div>
+
+                <!-- Cash Tendered & Change Row (Only when Cash selected) -->
+                <div class="row g-2 mb-3" id="cash-tendered-row">
+                  <div class="col-6">
+                    <label class="form-label small text-muted mb-1">Cash Tendered:</label>
+                    <input type="number" class="form-control form-control-sm mono-num" placeholder="₹ Amount" oninput="PosModule.calculateChange(this.value)">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small text-muted mb-1">Change Return:</label>
+                    <div class="form-control form-control-sm mono-num fw-bold text-success bg-light" id="pos-change-returned">₹0.00</div>
+                  </div>
+                </div>
+
+                <!-- Complete Checkout Button -->
+                <button class="btn btn-meat-primary w-100 py-2 fs-6 btn-pop" id="pos-checkout-btn" onclick="PosModule.executeCheckout()" disabled>
+                  <i class="bi bi-check2-circle fs-5"></i> Complete Sale & Print Bill
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             3. INVENTORY & WASTAGE VIEW
+             ================================================================== -->
+        <section id="view-inventory" class="view-section" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Inventory & Stock Ledger</h2>
+              <div class="text-muted small">Monitor real-time weights, track spoilage/trimming losses and audit movements.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-danger btn-sm" onclick="InventoryModule.openWastageModal()">
+                <i class="bi bi-trash-fill"></i> Log Spoilage / Wastage
+              </button>
+              <button class="btn btn-meat-primary btn-sm admin-only" onclick="InventoryModule.openAdjustmentModal()">
+                <i class="bi bi-plus-circle"></i> Quick Stock Adjustment
+              </button>
+            </div>
+          </div>
+
+          <!-- Inventory Summary Row -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+              <div class="stat-card" onclick="InventoryModule.filterStatus('all')">
+                <div class="stat-title">Total Kilograms</div>
+                <div class="stat-value mono-num" id="inv-total-kg">0.00 KG</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="stat-card" onclick="InventoryModule.filterStatus('all')">
+                <div class="stat-title">Total Pieces</div>
+                <div class="stat-value mono-num" id="inv-total-pcs">0 PCS</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="stat-card border-warning" onclick="InventoryModule.filterStatus('low_stock')">
+                <div class="stat-title text-warning-emphasis">Low Stock Alerts</div>
+                <div class="stat-value mono-num text-warning-emphasis" id="inv-low-count">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="stat-card border-danger" onclick="InventoryModule.filterStatus('out_of_stock')">
+                <div class="stat-title text-danger">Out of Stock</div>
+                <div class="stat-value mono-num text-danger" id="inv-out-count">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Items Table -->
+          <div class="content-card mb-4">
+            <div class="card-header-flex">
+              <div class="d-flex align-items-center gap-2">
+                <h5 class="mb-0">Current Meat Cut Balances</h5>
+                <div class="btn-group btn-group-sm ms-3">
+                  <button class="btn btn-outline-secondary active" data-inv-filter="all" onclick="InventoryModule.filterStatus('all')">All</button>
+                  <button class="btn btn-outline-secondary" data-inv-filter="low_stock" onclick="InventoryModule.filterStatus('low_stock')">Low Stock</button>
+                  <button class="btn btn-outline-secondary" data-inv-filter="out_of_stock" onclick="InventoryModule.filterStatus('out_of_stock')">Out of Stock</button>
+                </div>
+              </div>
+              <input type="text" class="form-control form-control-sm" style="width: 220px;" placeholder="Filter by product name..." oninput="InventoryModule.fetchInventory()">
+            </div>
+
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Product & SKU</th>
+                    <th>Category</th>
+                    <th>Current Balance</th>
+                    <th>Min Alert Level</th>
+                    <th class="admin-only">Cost / Unit</th>
+                    <th>Selling Rate</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-table-tbody">
+                  <!-- Injected via inventory.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Stock Movement Audit Ledger -->
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div>
+                <h5 class="mb-1">Stock Movement Audit Ledger</h5>
+                <div class="text-muted small">Transactional trace of all purchases, sales, customer returns, and wastage write-offs</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Product</th>
+                    <th>Movement Type</th>
+                    <th>Quantity</th>
+                    <th>Stock Delta</th>
+                    <th>Reference</th>
+                    <th>Reason / Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-movements-tbody">
+                  <!-- Injected via inventory.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             4. PRODUCTS & CUTS VIEW
+             ================================================================== -->
+        <section id="view-products" class="view-section" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Artisanal Cuts & Products Catalog</h2>
+              <div class="text-muted small">Manage cuts, categories, pricing, unit specifications (KG vs Pieces).</div>
+            </div>
+            <button class="btn btn-meat-primary btn-sm admin-only" onclick="ProductsModule.openAddModal()">
+              <i class="bi bi-plus-lg"></i> Add New Product Cut
+            </button>
+          </div>
+
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div class="header-search">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search product SKU or name..." oninput="ProductsModule.renderProductsTable(this.value)">
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Product Name & Cut</th>
+                    <th>SKU</th>
+                    <th>Category</th>
+                    <th>Unit</th>
+                    <th class="admin-only">Cost Price</th>
+                    <th>Selling Price</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-tbody">
+                  <!-- Injected via products.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             5. CUSTOMERS VIEW
+             ================================================================== -->
+        <section id="view-customers" class="view-section" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Customer Management</h2>
+              <div class="text-muted small">Customer profiles, loyalty rewards points, and purchase history.</div>
+            </div>
+            <button class="btn btn-meat-primary btn-sm" onclick="CustomersModule.openAddModal()">
+              <i class="bi bi-person-plus-fill"></i> Register New Customer
+            </button>
+          </div>
+
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Customer Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Total Spent</th>
+                    <th>Loyalty Points</th>
+                    <th>Pending Balance</th>
+                    <th>Preferences / Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="customers-table-tbody">
+                  <!-- Injected via customers.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             6. SUPPLIERS & INTAKE VIEW (ADMIN ONLY)
+             ================================================================== -->
+        <section id="view-suppliers" class="view-section admin-only" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Suppliers & Wholesale Farm Intake</h2>
+              <div class="text-muted small">Manage livestock farms, coastal fisheries, and record batch stock intake.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm" onclick="SuppliersModule.openIntakeModal()">
+                <i class="bi bi-box-arrow-in-down"></i> Record Purchase Intake
+              </button>
+              <button class="btn btn-meat-primary btn-sm" onclick="SuppliersModule.openAddModal()">
+                <i class="bi bi-plus-lg"></i> Add Supplier
+              </button>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Company / Farm</th>
+                    <th>Contact Person</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Outstanding Dues</th>
+                    <th>Address</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="suppliers-table-tbody">
+                  <!-- Injected via customers.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             7. EXPENSES VIEW (ADMIN ONLY)
+             ================================================================== -->
+        <section id="view-expenses" class="view-section admin-only" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Operating Expenses & Overheads</h2>
+              <div class="text-muted small">Track refrigeration utilities, rent, employee salaries, and butcher supplies.</div>
+            </div>
+            <button class="btn btn-meat-primary btn-sm" onclick="FinanceModule.openAddModal()">
+              <i class="bi bi-plus-lg"></i> Record Expense
+            </button>
+          </div>
+
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div>
+                <span class="text-muted small">Total Operating Expenses:</span>
+                <span class="fs-4 fw-bold mono-num text-danger ms-2" id="finance-total-expenses">₹0.00</span>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Description</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-table-tbody">
+                  <!-- Injected via finance.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             8. REPORTS & ANALYTICS VIEW (ADMIN ONLY)
+             ================================================================== -->
+        <section id="view-reports" class="view-section admin-only" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Reports & Financial Analytics</h2>
+              <div class="text-muted small">Pandas-powered Profit & Loss statements and one-click data exports.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success btn-sm btn-pop" onclick="ReportsModule.exportReport('sales', 'excel')">
+                <i class="bi bi-file-earmark-excel-fill"></i> Export Excel (.xlsx)
+              </button>
+              <button class="btn btn-danger btn-sm btn-pop" onclick="ReportsModule.exportReport('pnl', 'pdf')">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF Report
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="ReportsModule.exportReport('sales', 'csv')">
+                <i class="bi bi-filetype-csv"></i> CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Date Filters -->
+          <div class="content-card mb-4 p-3">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label small text-muted mb-1">Start Date:</label>
+                <input type="date" id="report-start-date" class="form-control form-control-sm">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-muted mb-1">End Date:</label>
+                <input type="date" id="report-end-date" class="form-control form-control-sm">
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-meat-primary btn-sm w-100" onclick="ReportsModule.fetchPnL()">
+                  <i class="bi bi-funnel-fill"></i> Apply Filter & Recalculate
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bank-Grade Profit & Loss Statement Card -->
+          <div class="content-card">
+            <h5 class="mb-3 border-bottom pb-2">Comprehensive Profit & Loss Statement (SRS FR-41)</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle">
+                <tbody>
+                  <tr class="table-light">
+                    <td class="fw-bold">1. Total Net Sales Revenue</td>
+                    <td class="mono-num fw-bold fs-5 text-end text-dark" id="pnl-revenue">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td class="ps-4 text-muted">Less: Cost of Goods Sold (COGS - Purchase Cost of Meat Sold)</td>
+                    <td class="mono-num text-end text-muted" id="pnl-cogs">₹0.00</td>
+                  </tr>
+                  <tr class="table-success">
+                    <td class="fw-bold text-success fs-6">GROSS PROFIT (Revenue &minus; COGS)</td>
+                    <td class="mono-num fw-bold fs-5 text-end text-success" id="pnl-gross-profit">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td class="ps-4">Gross Profit Margin %</td>
+                    <td class="mono-num text-end fw-bold" id="pnl-gross-margin">0%</td>
+                  </tr>
+                  <tr>
+                    <td class="ps-4 text-danger">Less: Operating Expenses (Electricity, Cold Storage, Rent, Wages)</td>
+                    <td class="mono-num text-end text-danger" id="pnl-expenses">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td class="ps-4 text-danger">Less: Spoilage & Trimming Wastage Cost</td>
+                    <td class="mono-num text-end text-danger" id="pnl-wastage">₹0.00</td>
+                  </tr>
+                  <tr class="table-primary">
+                    <td class="fw-bold text-primary fs-5">NET OPERATING RESULT (EBITDA)</td>
+                    <td class="mono-num fw-bold fs-4 text-end text-primary" id="pnl-net-result">₹0.00</td>
+                  </tr>
+                  <tr>
+                    <td class="ps-4">Net Operating Margin %</td>
+                    <td class="mono-num text-end fw-bold" id="pnl-net-margin">0%</td>
+                  </tr>
+                  <tr>
+                    <td class="ps-4">Total Billed Invoices</td>
+                    <td class="mono-num text-end fw-bold" id="pnl-bills-count">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             9. EMPLOYEES VIEW (ADMIN ONLY)
+             ================================================================== -->
+        <section id="view-employees" class="view-section admin-only" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Staff & Employee Accounts</h2>
+              <div class="text-muted small">Manage cashier credentials, role permissions, and quick PIN logins.</div>
+            </div>
+            <button class="btn btn-meat-primary btn-sm" onclick="EmployeesModule.openAddModal()">
+              <i class="bi bi-person-plus-fill"></i> Add New Employee
+            </button>
+          </div>
+
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Full Name & Email</th>
+                    <th>Role</th>
+                    <th>Quick PIN</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Last Active</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="employees-table-tbody">
+                  <!-- Injected via employees.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             10. SETTINGS VIEW (ADMIN ONLY)
+             ================================================================== -->
+        <section id="view-settings" class="view-section admin-only" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Store Parameters & Database Configuration</h2>
+              <div class="text-muted small">Shop invoice header, GST rates, currency and Supabase PostgreSQL integration.</div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <div class="content-card">
+                <h5 class="mb-3">Shop Profile & Invoice Settings</h5>
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Shop Trading Name:</label>
+                  <input type="text" id="shop-name-input" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Tagline:</label>
+                  <input type="text" id="shop-tagline-input" class="form-control">
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <label class="form-label small text-muted">Phone Number:</label>
+                    <input type="text" id="shop-phone-input" class="form-control">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small text-muted">GST / Tax Number:</label>
+                    <input type="text" id="shop-gst-input" class="form-control">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Physical Store Address:</label>
+                  <input type="text" id="shop-address-input" class="form-control">
+                </div>
+                <div class="row g-2 mb-4">
+                  <div class="col-4">
+                    <label class="form-label small text-muted">Default Tax %:</label>
+                    <input type="number" id="shop-tax-input" class="form-control" step="0.1">
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small text-muted">Currency Symbol:</label>
+                    <input type="text" id="shop-currency-input" class="form-control">
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small text-muted">Invoice Prefix:</label>
+                    <input type="text" id="shop-prefix-input" class="form-control">
+                  </div>
+                </div>
+                <button class="btn btn-meat-primary w-100" onclick="SettingsModule.saveShopProfile()">
+                  Save Store Settings
+                </button>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="content-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <h5 class="mb-0">Supabase PostgreSQL Integration</h5>
+                  <span id="supabase-status-badge" class="badge bg-secondary">LOCAL PERSISTENT ENGINE</span>
+                </div>
+                <p class="small text-muted mb-3">
+                  The system operates in dual-mode: you can link your live Supabase project by providing the URL and anon/service key below, or keep using the zero-config local engine.
+                </p>
+
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Supabase Project URL:</label>
+                  <input type="text" id="supabase-url-input" class="form-control font-monospace" placeholder="https://xyz.supabase.co">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small text-muted">Supabase Key (Anon / Service Role):</label>
+                  <input type="password" id="supabase-key-input" class="form-control font-monospace" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
+                </div>
+                <div class="d-flex gap-2 mb-4">
+                  <button class="btn btn-outline-primary flex-grow-1" onclick="SettingsModule.testSupabase()">
+                    <i class="bi bi-cloud-arrow-up-fill"></i> Save & Verify Connection
+                  </button>
+                </div>
+
+                <div class="border rounded p-3 bg-light">
+                  <div class="fw-bold small mb-1">SQL Schema Deployment:</div>
+                  <div class="small text-muted mb-2">A complete production-ready schema with RLS policies is ready at <code>supabase_setup.sql</code> in the project root.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             11. AUDIT TRAIL VIEW (ADMIN ONLY)
+             ================================================================== -->
+        <section id="view-audit" class="view-section admin-only" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="mb-1">Security & Operational Audit Logs</h2>
+              <div class="text-muted small">Immutable compliance trail recording logins, sales, refunds, stock adjustments and admin actions.</div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Actor & Role</th>
+                    <th>Module</th>
+                    <th>Action</th>
+                    <th>Metadata</th>
+                    <th>IP Address</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-tbody">
+                  <!-- Injected via settings.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ======================================================================
+       MODALS
+       ====================================================================== -->
+
+  <!-- Thermal Receipt Modal -->
+  <div class="modal fade" id="thermalReceiptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6"><i class="bi bi-receipt me-2"></i> Thermal 80mm Receipt Preview</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <div id="thermal-receipt-preview">
+            <!-- Rendered in pos.js -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-meat-primary" onclick="PosModule.printReceipt()">
+            <i class="bi bi-printer-fill me-1"></i> Print Thermal Receipt
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPI QR Simulation Modal -->
+  <div class="modal fade" id="posUpiModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content text-center p-3">
+        <div class="modal-header border-0 pb-0 justify-content-center">
+          <h5 class="modal-title fw-bold">Scan UPI QR Code</h5>
+        </div>
+        <div class="modal-body">
+          <div class="fs-4 fw-bold text-danger mono-num mb-3" id="upi-modal-amount">₹0.00</div>
+          <!-- Dynamic QR Image simulation -->
+          <div class="p-3 bg-white border rounded shadow-sm d-inline-block mb-3">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=freshcut@bank&pn=FreshCutMeats" alt="UPI QR" class="img-fluid" style="width: 170px; height: 170px;">
+          </div>
+          <div class="small text-muted">Supports Google Pay, PhonePe, Paytm, and BHIM UPI</div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary w-100 mb-2" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success w-100 fw-bold" id="upi-verify-success-btn">
+            <i class="bi bi-check-circle-fill me-1"></i> Verify Payment Received
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory Spoilage / Wastage Modal -->
+  <div class="modal fade" id="invWastageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6"><i class="bi bi-trash-fill me-2"></i> Log Spoilage, Trimming or Bone Deduction</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Select Product Cut:</label>
+            <select class="form-select" id="modal-wastage-product-id"></select>
+            <small class="text-muted" id="modal-wastage-max-hint"></small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Wastage Quantity (<span id="modal-wastage-unit-label">KG</span>):</label>
+            <input type="number" step="0.001" min="0.001" class="form-control mono-num" id="modal-wastage-qty" placeholder="e.g. 0.450">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Audit Reason Category (Mandatory):</label>
+            <select class="form-select" id="modal-wastage-reason">
+              <option value="Trimming Loss (Fat / Sinew)">Trimming Loss (Fat / Sinew removal)</option>
+              <option value="Bone Deduction">Bone Deduction (De-boning scrap)</option>
+              <option value="Cold Chain Spoilage">Cold Chain Spoilage (Chiller temperature fluctuation)</option>
+              <option value="End of Day Shelf Expiry">End of Day Shelf Expiry</option>
+              <option value="Handling / Drop Damage">Handling / Drop Damage</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Additional Officer Notes:</label>
+            <textarea class="form-control" id="modal-wastage-notes" rows="2" placeholder="Optional audit explanation..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="InventoryModule.submitWastage()">
+            Confirm & Reduce Stock
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory Adjustment Modal -->
+  <div class="modal fade" id="invAdjustmentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6"><i class="bi bi-sliders me-2"></i> Inventory Recount / Adjustment</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Select Product:</label>
+            <select class="form-select" id="modal-adjust-product-id"></select>
+            <small class="text-primary fw-bold" id="modal-adjust-cur-stock"></small>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Adjustment Type:</label>
+              <select class="form-select" id="modal-adjust-type">
+                <option value="ADD">Add (+) Stock</option>
+                <option value="REDUCE">Reduce (&minus;) Stock</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Quantity (<span id="modal-adjust-unit-label">KG</span>):</label>
+              <input type="number" step="0.001" min="0.001" class="form-control mono-num" id="modal-adjust-qty" placeholder="e.g. 5.000">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Adjustment Reason:</label>
+            <input type="text" class="form-control" id="modal-adjust-reason" placeholder="e.g. Physical inventory recount reconciliation">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="InventoryModule.submitAdjustment()">
+            Save Stock Adjustment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6" id="product-modal-title">Product Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <input type="hidden" id="prod-form-id">
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">SKU / Code:</label>
+              <input type="text" id="prod-form-sku" class="form-control font-monospace">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label small fw-bold text-muted">Product Name:</label>
+              <input type="text" id="prod-form-name" class="form-control" placeholder="e.g. Tenderloin Steak Fillet">
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">Category:</label>
+              <select id="prod-form-category" class="form-select">
+                <option value="poultry">Poultry</option>
+                <option value="mutton">Mutton & Lamb</option>
+                <option value="beef">Prime Beef</option>
+                <option value="seafood">Seafood & Fish</option>
+                <option value="deli">Marinated & Deli</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">Unit of Measure:</label>
+              <select id="prod-form-unit" class="form-select">
+                <option value="KG">Kilogram (KG - Decimals)</option>
+                <option value="PCS">Piece (PCS - Whole Count)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">Min Alert Threshold:</label>
+              <input type="number" id="prod-form-min-stock" class="form-control" step="0.1">
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">Selling Price (₹):</label>
+              <input type="number" id="prod-form-selling" class="form-control mono-num" step="0.01">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">Cost Price (₹):</label>
+              <input type="number" id="prod-form-cost" class="form-control mono-num" step="0.01">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-muted">Opening Stock:</label>
+              <input type="number" id="prod-form-initial-stock" class="form-control mono-num" step="0.1">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Product Description & Cut Guide:</label>
+            <textarea id="prod-form-desc" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="ProductsModule.saveProduct()">
+            Save Product
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Modal -->
+  <div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6">Customer Registration</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Customer Full Name:</label>
+            <input type="text" id="cust-form-name" class="form-control">
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Phone Number:</label>
+              <input type="text" id="cust-form-phone" class="form-control">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Email (Optional):</label>
+              <input type="email" id="cust-form-email" class="form-control">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Delivery Address:</label>
+            <input type="text" id="cust-form-address" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Preferences / Notes:</label>
+            <textarea id="cust-form-notes" class="form-control" rows="2" placeholder="e.g. Skinless boneless cuts preferred"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="CustomersModule.saveCustomer()">
+            Register Customer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supplier Modal -->
+  <div class="modal fade" id="supplierModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6">Add Livestock / Farm Supplier</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Supplier / Farm Name:</label>
+            <input type="text" id="supp-form-company" class="form-control">
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Contact Person:</label>
+              <input type="text" id="supp-form-contact" class="form-control">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Phone Number:</label>
+              <input type="text" id="supp-form-phone" class="form-control">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Email:</label>
+              <input type="email" id="supp-form-email" class="form-control">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">GST / Tax ID:</label>
+              <input type="text" id="supp-form-gst" class="form-control">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Farm / Office Address:</label>
+            <input type="text" id="supp-form-address" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="SuppliersModule.saveSupplier()">
+            Save Supplier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purchase Intake Modal -->
+  <div class="modal fade" id="purchaseIntakeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6"><i class="bi bi-box-arrow-in-down me-2"></i> Record Wholesale Stock Intake</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Supplier:</label>
+            <select id="intake-form-supplier" class="form-select"></select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Product Cut Received:</label>
+            <select id="intake-form-product" class="form-select"></select>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Weight / Quantity:</label>
+              <input type="number" step="0.001" id="intake-form-qty" class="form-control mono-num" placeholder="e.g. 25.000">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Unit Cost Rate (₹):</label>
+              <input type="number" step="0.01" id="intake-form-cost" class="form-control mono-num" placeholder="e.g. 620.00">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Supplier Delivery Invoice / DC Number:</label>
+            <input type="text" id="intake-form-invoice-no" class="form-control font-monospace">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="SuppliersModule.submitIntake()">
+            Confirm Stock Intake
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div class="modal fade" id="expenseModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6">Record Operating Expense</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Category:</label>
+            <select id="exp-form-category" class="form-select">
+              <option value="Electricity & Cold Chain">Electricity & Cold Chain Power</option>
+              <option value="Rent">Shop & Cold Room Rent</option>
+              <option value="Salaries">Butcher & Staff Salaries</option>
+              <option value="Packaging Materials">Packaging (Butcher Paper, Trays)</option>
+              <option value="Transport & Logistics">Transport & Cold Van Transit</option>
+              <option value="Sanitization & Pest Control">Sanitization & Disinfection</option>
+              <option value="Equipment Maintenance">Equipment Maintenance & Knives</option>
+              <option value="Other">Other Miscellaneous</option>
+            </select>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Amount (₹):</label>
+              <input type="number" step="0.01" id="exp-form-amount" class="form-control mono-num" placeholder="0.00">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Date:</label>
+              <input type="date" id="exp-form-date" class="form-control">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Payment Method:</label>
+            <select id="exp-form-method" class="form-select">
+              <option value="UPI">UPI</option>
+              <option value="CASH">Cash</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Expense Description / Bill Reference:</label>
+            <textarea id="exp-form-desc" class="form-control" rows="2" placeholder="e.g. 3-phase chiller power bill"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="FinanceModule.saveExpense()">
+            Record Expense
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Modal -->
+  <div class="modal fade" id="employeeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fs-6">Create Staff Account</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Full Name:</label>
+            <input type="text" id="emp-form-name" class="form-control" placeholder="e.g. Ramesh Kumar">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Email Address:</label>
+            <input type="email" id="emp-form-email" class="form-control" placeholder="ramesh@freshcut.com">
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Role:</label>
+              <select id="emp-form-role" class="form-select">
+                <option value="employee">Cashier / Staff (POS Only)</option>
+                <option value="admin">Administrator / Owner</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Quick 4-Digit PIN:</label>
+              <input type="text" id="emp-form-pin" class="form-control font-monospace" placeholder="e.g. 5678" maxlength="6">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Phone Number:</label>
+              <input type="text" id="emp-form-phone" class="form-control">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-muted">Initial Password:</label>
+              <input type="password" id="emp-form-password" class="form-control" value="FreshCut2026!">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-meat-primary" onclick="EmployeesModule.saveEmployee()">
+            Create Staff Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/pos.js"></script>
+  <script src="/static/js/inventory.js"></script>
+  <script src="/static/js/products.js"></script>
+  <script src="/static/js/customers.js"></script>
+  <script src="/static/js/finance.js"></script>
+  <script src="/static/js/reports.js"></script>
+  <script src="/static/js/employees.js"></script>
+  <script src="/static/js/settings.js"></script>
+
+</body>
+</html>
