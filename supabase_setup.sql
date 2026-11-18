@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     sku VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(150) NOT NULL,
-    category VARCHAR(50) NOT NULL, -- 'poultry', 'mutton', 'beef', 'seafood', 'deli', 'other'
+    category VARCHAR(50) NOT NULL, -- 'poultry', 'mutton', 'seafood', 'deli', 'other'
     unit VARCHAR(20) NOT NULL DEFAULT 'KG' CHECK (unit IN ('KG', 'PCS')),
     cost_price NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
     selling_price NUMERIC(12, 2) NOT NULL DEFAULT 0.00,

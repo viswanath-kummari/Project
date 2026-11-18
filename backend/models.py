@@ -43,7 +43,7 @@ class Product(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     sku = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(150), nullable=False)
-    category = db.Column(db.String(50), nullable=False) # 'poultry', 'mutton', 'beef', 'seafood', 'deli'
+    category = db.Column(db.String(50), nullable=False) # 'poultry', 'mutton', 'seafood', 'deli'
     unit = db.Column(db.String(20), nullable=False, default='KG') # 'KG' or 'PCS'
     cost_price = db.Column(db.Float, nullable=False, default=0.0)
     selling_price = db.Column(db.Float, nullable=False, default=0.0)

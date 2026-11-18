@@ -36,11 +36,20 @@ const ProductsModule = {
 
     const isAdmin = (App.currentUser && App.currentUser.role === 'admin');
 
-    tbody.innerHTML = list.map(p => `
+    const defaultImg = 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=100&q=80';
+
+    tbody.innerHTML = list.map(p => {
+      const imgSrc = p.image_url || defaultImg;
+      return `
       <tr>
         <td>
-          <div class="fw-bold text-dark">${p.name}</div>
-          <small class="text-muted">${p.description || 'Artisanal cut'}</small>
+          <div class="d-flex align-items-center gap-3">
+            <img src="${imgSrc}" alt="${p.name}" class="rounded-3 shadow-xs border flex-shrink-0" style="width: 46px; height: 46px; object-fit: cover;" onerror="this.src='${defaultImg}'">
+            <div>
+              <div class="fw-bold text-dark">${p.name}</div>
+              <small class="text-muted">${p.description || 'Artisanal cut'}</small>
+            </div>
+          </div>
         </td>
         <td><span class="badge bg-light text-dark border font-monospace">${p.sku}</span></td>
         <td><span class="badge badge-${p.category}">${p.category.toUpperCase()}</span></td>
@@ -60,7 +69,7 @@ const ProductsModule = {
           ` : `<span class="badge bg-light text-muted">View Only</span>`}
         </td>
       </tr>
-    `).join('');
+    `}).join('');
   },
 
   openAddModal() {
@@ -73,8 +82,11 @@ const ProductsModule = {
     document.getElementById('prod-form-selling').value = '';
     document.getElementById('prod-form-cost').value = '';
     document.getElementById('prod-form-min-stock').value = '5.0';
+    document.getElementById('prod-form-initial-stock').closest('.mb-3').style.display = 'block';
     document.getElementById('prod-form-initial-stock').value = '10.0';
     document.getElementById('prod-form-desc').value = '';
+    const imgInput = document.getElementById('prod-form-image');
+    if (imgInput) imgInput.value = '';
 
     const modal = new bootstrap.Modal(document.getElementById('productModal'));
     modal.show();
@@ -95,6 +107,8 @@ const ProductsModule = {
     document.getElementById('prod-form-min-stock').value = p.min_stock_level;
     document.getElementById('prod-form-initial-stock').closest('.mb-3').style.display = 'none';
     document.getElementById('prod-form-desc').value = p.description || '';
+    const imgInput = document.getElementById('prod-form-image');
+    if (imgInput) imgInput.value = p.image_url || '';
 
     const modal = new bootstrap.Modal(document.getElementById('productModal'));
     modal.show();
@@ -111,6 +125,8 @@ const ProductsModule = {
     const min_stock_level = parseFloat(document.getElementById('prod-form-min-stock').value) || 5;
     const initial_stock = parseFloat(document.getElementById('prod-form-initial-stock').value) || 0;
     const description = document.getElementById('prod-form-desc').value.trim();
+    const imgInput = document.getElementById('prod-form-image');
+    const image_url = imgInput ? imgInput.value.trim() : '';
 
     if (!sku || !name || isNaN(selling_price)) {
       App.showToast('Please fill all required fields.', 'warning');
@@ -120,12 +136,12 @@ const ProductsModule = {
     try {
       if (id) {
         await Api.put(`/products/${id}`, {
-          sku, name, category, unit, selling_price, cost_price, min_stock_level, description
+          sku, name, category, unit, selling_price, cost_price, min_stock_level, description, image_url
         });
         App.showToast('Product updated successfully!', 'success');
       } else {
         await Api.post('/products', {
-          sku, name, category, unit, selling_price, cost_price, min_stock_level, initial_stock, description
+          sku, name, category, unit, selling_price, cost_price, min_stock_level, initial_stock, description, image_url
         });
         App.showToast('New product created!', 'success');
       }

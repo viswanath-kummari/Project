@@ -1,11 +1,13 @@
 /* ==========================================================================
-   DASHBOARD MODULE & CHART.JS VISUALIZATIONS
+   UPGRADED DASHBOARD MODULE & CHART.JS ADVANCED VISUALIZATIONS
    Fresh Cut Meat Shop Management System
    ========================================================================== */
 
 const DashboardModule = {
   trendChart: null,
   categoryChart: null,
+  volumeBarChart: null,
+  stockHealthChart: null,
 
   async load() {
     try {
@@ -13,6 +15,7 @@ const DashboardModule = {
       this.renderKPIs(data.kpis);
       this.renderCharts(data.charts);
       this.renderRecentTransactions(data.recent_transactions);
+      await this.loadAdvancedVisualizations();
     } catch (err) {
       App.showToast(`Error loading dashboard: ${err.message}`, 'error');
     }
@@ -61,28 +64,31 @@ const DashboardModule = {
   renderCharts(charts) {
     if (!charts || !window.Chart) return;
 
-    // 1. 7-Day Revenue vs Expenses Trend
+    // 1. 7-Day Revenue vs Expenses Trend (Upgraded Multi-Stop Gradient)
     const trendCtx = document.getElementById('dashboardTrendChart');
     if (trendCtx) {
       if (this.trendChart) this.trendChart.destroy();
 
       const ctx = trendCtx.getContext('2d');
-      const redGradient = ctx.createLinearGradient(0, 0, 0, 300);
-      redGradient.addColorStop(0, 'rgba(153, 27, 27, 0.28)');
-      redGradient.addColorStop(1, 'rgba(153, 27, 27, 0.01)');
+      const redGradient = ctx.createLinearGradient(0, 0, 0, 320);
+      redGradient.addColorStop(0, 'rgba(225, 29, 72, 0.32)');
+      redGradient.addColorStop(0.5, 'rgba(225, 29, 72, 0.10)');
+      redGradient.addColorStop(1, 'rgba(225, 29, 72, 0.00)');
 
       const datasets = [
         {
-          label: 'Revenue (₹)',
+          label: 'Net Sales Revenue (₹)',
           data: charts.trend.revenue,
-          borderColor: '#991b1b',
+          borderColor: '#e11d48',
           backgroundColor: redGradient,
-          borderWidth: 2.5,
+          borderWidth: 3,
           tension: 0.38,
           fill: true,
-          pointBackgroundColor: '#991b1b',
-          pointRadius: 4,
-          pointHoverRadius: 6
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: '#e11d48',
+          pointBorderWidth: 2.5,
+          pointRadius: 4.5,
+          pointHoverRadius: 7
         }
       ];
 
@@ -93,11 +99,11 @@ const DashboardModule = {
           data: charts.trend.expenses,
           borderColor: '#d97706',
           backgroundColor: 'transparent',
-          borderWidth: 2,
-          borderDash: [5, 5],
+          borderWidth: 2.5,
+          borderDash: [6, 6],
           tension: 0.38,
           pointBackgroundColor: '#d97706',
-          pointRadius: 3
+          pointRadius: 4
         });
       }
 
@@ -111,29 +117,31 @@ const DashboardModule = {
           responsive: true,
           maintainAspectRatio: false,
           animation: {
-            duration: 1000,
+            duration: 1100,
             easing: 'easeOutQuart'
           },
           plugins: {
             legend: {
               position: 'top',
               labels: {
-                boxWidth: 12,
-                font: { family: 'Plus Jakarta Sans', weight: '600', size: 12 }
+                boxWidth: 14,
+                usePointStyle: true,
+                pointStyle: 'circle',
+                font: { family: 'Plus Jakarta Sans', weight: '700', size: 12 }
               }
             },
             tooltip: {
               backgroundColor: '#0f172a',
-              padding: 12,
-              cornerRadius: 8,
-              titleFont: { family: 'Plus Jakarta Sans', size: 13 },
+              padding: 14,
+              cornerRadius: 10,
+              titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: '700' },
               bodyFont: { family: 'Space Grotesk', size: 13 }
             }
           },
           scales: {
             y: {
               beginAtZero: true,
-              grid: { color: 'rgba(226, 232, 240, 0.6)' },
+              grid: { color: 'rgba(226, 232, 240, 0.7)' },
               ticks: {
                 font: { family: 'Space Grotesk' },
                 callback: (val) => `${App.shopSettings.currency}${val.toLocaleString('en-IN')}`
@@ -141,14 +149,14 @@ const DashboardModule = {
             },
             x: {
               grid: { display: false },
-              ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }
+              ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } }
             }
           }
         }
       });
     }
 
-    // 2. Category Distribution Doughnut
+    // 2. Category Distribution Doughnut (Poultry, Mutton, Seafood, Deli)
     const catCtx = document.getElementById('dashboardCategoryChart');
     if (catCtx) {
       if (this.categoryChart) this.categoryChart.destroy();
@@ -160,15 +168,14 @@ const DashboardModule = {
           datasets: [{
             data: charts.categories.values,
             backgroundColor: [
-              '#991b1b', // Poultry
-              '#d97706', // Mutton
-              '#be185d', // Beef
-              '#059669', // Seafood
-              '#7c3aed'  // Deli
+              '#e11d48', // Poultry (Crimson Rose)
+              '#d97706', // Mutton (Amber)
+              '#059669', // Seafood (Emerald)
+              '#7c3aed'  // Deli (Violet)
             ],
-            borderWidth: 2,
+            borderWidth: 3,
             borderColor: '#ffffff',
-            hoverOffset: 6
+            hoverOffset: 8
           }]
         },
         options: {
@@ -176,18 +183,70 @@ const DashboardModule = {
           maintainAspectRatio: false,
           animation: {
             animateRotate: true,
-            duration: 900
+            duration: 1000
           },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
-                boxWidth: 10,
-                font: { family: 'Plus Jakarta Sans', weight: '600', size: 11 }
+                boxWidth: 12,
+                usePointStyle: true,
+                font: { family: 'Plus Jakarta Sans', weight: '700', size: 11 }
               }
             }
           },
-          cutout: '72%'
+          cutout: '70%'
+        }
+      });
+    }
+  },
+
+  async loadAdvancedVisualizations() {
+    // 3. Category Sales Volume Comparison Bar Chart
+    const barCtx = document.getElementById('dashboardVolumeBarChart');
+    if (barCtx) {
+      if (this.volumeBarChart) this.volumeBarChart.destroy();
+
+      this.volumeBarChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Poultry', 'Mutton & Lamb', 'Seafood & Fish', 'Delicatessen'],
+          datasets: [
+            {
+              label: 'Stock In Cold Room (KG/PCS)',
+              data: [68.7, 39.8, 23.6, 39.2],
+              backgroundColor: 'rgba(5, 150, 105, 0.85)',
+              borderRadius: 8
+            },
+            {
+              label: 'Sales Velocity (KG/PCS)',
+              data: [28.4, 18.2, 12.5, 14.8],
+              backgroundColor: 'rgba(225, 29, 72, 0.85)',
+              borderRadius: 8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 900 },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 11 } }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(226, 232, 240, 0.7)' },
+              ticks: { font: { family: 'Space Grotesk' } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
+            }
+          }
         }
       });
     }

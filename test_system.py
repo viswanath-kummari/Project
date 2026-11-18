@@ -39,11 +39,11 @@ class FreshCutSystemTest(unittest.TestCase):
         token = login_res.get_json()['token']
         headers = {'Authorization': f'Bearer {token}'}
 
-        # Get first active product
+        # Get first active KG product
         prod_res = self.client.get('/api/products', headers=headers)
         prods = prod_res.get_json()['products']
         self.assertTrue(len(prods) > 0)
-        prod = prods[0]
+        prod = next(p for p in prods if p['unit'] == 'KG')
 
         # Calculate cart with decimal KG (e.g. 1.250 kg)
         calc_res = self.client.post('/api/pos/calculate', headers=headers, json={

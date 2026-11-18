@@ -27,10 +27,160 @@
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
 
+  <!-- ======================================================================
+       AUTHENTICATION GATEWAY: DEDICATED LOGIN PORTAL
+       ====================================================================== -->
+  <div id="login-screen" style="display: none;">
+    <div class="login-bg-glow"></div>
+    <div class="login-bg-glow-2"></div>
+
+    <div class="login-card-container">
+      <!-- Left Hero Showcase -->
+      <div class="login-hero-side">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="brand-icon-box">
+              <i class="bi bi-shield-shaded"></i>
+            </div>
+            <div>
+              <h2 class="brand-title fs-3 mb-0">FRESH CUT</h2>
+              <div class="brand-subtitle">Artisanal Meat Co.</div>
+            </div>
+          </div>
+
+          <h3 class="fw-bold mb-3 text-white">Commercial-Grade Meat Retail & POS Engine</h3>
+          <p class="text-secondary small mb-4" style="color: #94a3b8 !important; line-height: 1.6;">
+            Precision sub-gram scale billing, real-time cold room inventory telemetry, spoilage loss accounting, and live Supabase PostgreSQL sync.
+          </p>
+
+          <div class="d-flex flex-column gap-2 mb-4">
+            <div class="d-flex align-items-center gap-2 small text-light">
+              <i class="bi bi-patch-check-fill text-danger fs-6"></i>
+              <span>100% Traceable Poultry, Mutton & Seafood</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 small text-light">
+              <i class="bi bi-speedometer2 text-success fs-6"></i>
+              <span>High-Speed KG & Piece Decimal Billing</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 small text-light">
+              <i class="bi bi-shield-lock text-primary fs-6"></i>
+              <span>Strict Role-Based Security (Admin vs Cashier)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Cloud Database</div>
+            <div class="fw-bold small text-success"><i class="bi bi-database-check me-1"></i>Supabase PostgreSQL</div>
+          </div>
+          <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 px-3 py-2">
+            Release 1.1 Live
+          </span>
+        </div>
+      </div>
+
+      <!-- Right Form / Keypad Side -->
+      <div class="login-form-side">
+        <div class="login-role-tabs">
+          <button id="login-tab-admin" class="login-role-btn active" onclick="App.switchLoginTab('admin')">
+            <i class="bi bi-shield-lock-fill"></i> Owner / Admin
+          </button>
+          <button id="login-tab-employee" class="login-role-btn" onclick="App.switchLoginTab('employee')">
+            <i class="bi bi-person-badge-fill"></i> Cashier PIN
+          </button>
+        </div>
+
+        <!-- 1. Administrator Login Form -->
+        <div id="login-panel-admin">
+          <div class="mb-3">
+            <h4 class="fw-bold mb-1">Owner Sign In</h4>
+            <div class="text-muted small">Access financial reports, staff management and store settings.</div>
+          </div>
+
+          <form onsubmit="App.handleAdminLogin(event)">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted mb-1">Admin Email:</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                <input type="email" id="login-admin-email" class="form-control border-start-0" value="admin@freshcut.com" required>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-muted mb-1">Password:</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                <input type="password" id="login-admin-password" class="form-control border-start-0" value="AdminPassword123!" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-meat-primary w-100 py-2 fs-6 btn-pop mb-3">
+              <i class="bi bi-box-arrow-in-right fs-5"></i> Enter Management Portal
+            </button>
+          </form>
+
+          <div class="demo-chip-box">
+            <div>
+              <div class="small fw-bold text-dark">Demo Admin Account</div>
+              <div class="small text-muted font-monospace">admin@freshcut.com</div>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" onclick="App.quickDemoLogin('admin')">
+              1-Click Fill
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Cashier Touch PIN Keypad -->
+        <div id="login-panel-employee" style="display: none;">
+          <div class="text-center mb-2">
+            <h4 class="fw-bold mb-1">Cashier Station Sign In</h4>
+            <div class="text-muted small">Enter your 4-digit staff PIN to start POS billing shift.</div>
+          </div>
+
+          <!-- PIN Dots Indicator -->
+          <div class="pin-display-dots">
+            <div class="pin-dot" id="pin-dot-1"></div>
+            <div class="pin-dot" id="pin-dot-2"></div>
+            <div class="pin-dot" id="pin-dot-3"></div>
+            <div class="pin-dot" id="pin-dot-4"></div>
+          </div>
+
+          <!-- Interactive Numeric Keypad -->
+          <div class="pin-keypad-grid">
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(1)">1</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(2)">2</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(3)">3</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(4)">4</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(5)">5</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(6)">6</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(7)">7</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(8)">8</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(9)">9</button>
+            <button type="button" class="pin-key-btn text-danger fs-6" onclick="App.resetPin()">CLR</button>
+            <button type="button" class="pin-key-btn" onclick="App.pinKeyPress(0)">0</button>
+            <button type="button" class="pin-key-btn text-secondary" onclick="App.pinBackspace()"><i class="bi bi-backspace"></i></button>
+          </div>
+
+          <div class="demo-chip-box">
+            <div>
+              <div class="small fw-bold text-dark">Demo Cashier Account</div>
+              <div class="small text-muted font-monospace">PIN: 5678 (Aarav Sharma)</div>
+            </div>
+            <button class="btn btn-sm btn-outline-success" onclick="App.quickDemoLogin('employee')">
+              1-Click PIN Fill
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MAIN APPLICATION SHELL (AFTER SIGN IN)
+       ====================================================================== -->
   <div id="app-wrapper">
-    <!-- ======================================================================
-         SIDEBAR NAVIGATION
-         ====================================================================== -->
+    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar">
       <div class="sidebar-brand">
         <div class="brand-icon-box">
@@ -103,13 +253,13 @@
           <div class="fw-bold text-white text-truncate small" id="header-user-name">Vikram Rathore</div>
           <div class="text-muted" style="font-size: 0.72rem;" id="header-user-role">ADMINISTRATOR</div>
         </div>
-        <span class="badge bg-danger text-uppercase" id="current-role-badge" style="font-size: 0.68rem;">ADMIN</span>
+        <button class="btn btn-sm btn-link text-danger p-0" onclick="App.logout()" title="Sign Out">
+          <i class="bi bi-box-arrow-right fs-5"></i>
+        </button>
       </div>
     </aside>
 
-    <!-- ======================================================================
-         MAIN APPLICATION CONTENT
-         ====================================================================== -->
+    <!-- MAIN APPLICATION CONTENT -->
     <main id="main-content">
       <!-- Top Sticky Header -->
       <header class="top-header">
@@ -121,9 +271,9 @@
           <div class="d-flex align-items-center gap-2">
             <span class="badge bg-success-subtle text-success border border-success d-none d-md-inline-flex align-items-center gap-1">
               <span class="spinner-grow spinner-grow-sm" role="status"></span>
-              Supabase Ready &bull; Offline Resilient
+              Supabase PostgreSQL &bull; Live Connected
             </span>
-            <span class="text-muted small d-none d-xl-inline">| Enterprise Retail Release 1.1</span>
+            <span class="text-muted small d-none d-xl-inline">| Enterprise Retail 1.1</span>
           </div>
         </div>
 
@@ -134,7 +284,7 @@
               <i class="bi bi-person-gear me-1"></i> Switch Demo Role
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-              <li><h6 class="dropdown-header">Test Role-Based Access Control</h6></li>
+              <li><h6 class="dropdown-header">Switch Role Permissions</h6></li>
               <li>
                 <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-switch-role="admin">
                   <span class="badge bg-danger">ADMIN</span>
@@ -160,6 +310,11 @@
           <button class="btn btn-meat-primary btn-sm btn-pop" onclick="App.navigateTo('pos')">
             <i class="bi bi-cart-plus-fill"></i> New Sale
           </button>
+
+          <!-- Sign Out Button -->
+          <button class="btn btn-sm btn-outline-secondary" onclick="App.logout()" title="Sign Out">
+            <i class="bi bi-box-arrow-right"></i> Sign Out
+          </button>
         </div>
       </header>
 
@@ -167,17 +322,17 @@
       <div class="page-container">
 
         <!-- ==================================================================
-             1. DASHBOARD VIEW
+             1. DASHBOARD VIEW (UPGRADED VISUALIZATIONS)
              ================================================================== -->
         <section id="view-dashboard" class="view-section">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
               <h2 class="mb-1">Operations Dashboard</h2>
-              <div class="text-muted small">Live retail telemetry, sales performance and stock alerts.</div>
+              <div class="text-muted small">Live retail telemetry, sales velocity, cold room stock balances, and alerts.</div>
             </div>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-outline-secondary" onclick="DashboardModule.load()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
+                <i class="bi bi-arrow-clockwise"></i> Refresh Telemetry
               </button>
             </div>
           </div>
@@ -224,7 +379,7 @@
                 </div>
                 <div class="stat-value mono-num text-danger" id="kpi-low-stock">0</div>
                 <div class="stat-trend trend-down">
-                  <i class="bi bi-bell-fill"></i> Minimum threshold alerts
+                  <i class="bi bi-bell-fill"></i> Threshold alerts
                 </div>
               </div>
             </div>
@@ -248,13 +403,13 @@
             <div class="col-6 col-lg-4" id="kpi-gross-profit-card">
               <div class="stat-card interactive-card border-success" onclick="App.navigateTo('reports')">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                  <div class="stat-title text-success">Gross Profit (Rev - COGS)</div>
+                  <div class="stat-title text-success">Gross Profit (Rev &minus; COGS)</div>
                   <div class="stat-icon-wrapper icon-green">
                     <i class="bi bi-graph-up-arrow icon-animate-hover"></i>
                   </div>
                 </div>
                 <div class="stat-value mono-num text-success" id="kpi-gross-profit">₹ 0.00</div>
-                <div class="stat-trend trend-up">Excludes Operating Overhead</div>
+                <div class="stat-trend trend-up">Net margin before overhead</div>
               </div>
             </div>
 
@@ -280,23 +435,23 @@
                   </div>
                 </div>
                 <div class="stat-value mono-num text-primary" id="kpi-net-result">₹ 0.00</div>
-                <div class="stat-trend trend-up">EBITDA (Gross - Ops - Spoilage)</div>
+                <div class="stat-trend trend-up">EBITDA (Gross &minus; Ops &minus; Spoilage)</div>
               </div>
             </div>
           </div>
 
-          <!-- Charts Row -->
+          <!-- Charts Row 1: Line Trend & Category Doughnut -->
           <div class="row g-4 mb-4">
             <div class="col-lg-8">
               <div class="content-card">
                 <div class="card-header-flex">
                   <div>
-                    <h5 class="mb-1">Sales & Operating Trends (7 Days)</h5>
-                    <div class="text-muted small">Daily revenue progression with operating overhead</div>
+                    <h5 class="mb-1">Revenue & Cash Flow Telemetry (7 Days)</h5>
+                    <div class="text-muted small">Daily sales performance with operating overhead progression</div>
                   </div>
-                  <span class="badge bg-light text-dark border">Live Telemetry</span>
+                  <span class="badge bg-light text-dark border">60fps Live Telemetry</span>
                 </div>
-                <div style="height: 280px;">
+                <div style="height: 290px;">
                   <canvas id="dashboardTrendChart"></canvas>
                 </div>
               </div>
@@ -306,12 +461,30 @@
               <div class="content-card">
                 <div class="card-header-flex">
                   <div>
-                    <h5 class="mb-1">Volume by Category</h5>
-                    <div class="text-muted small">Revenue distribution by cut</div>
+                    <h5 class="mb-1">Category Distribution</h5>
+                    <div class="text-muted small">Volume split across cuts</div>
                   </div>
                 </div>
-                <div style="height: 280px; position: relative;">
+                <div style="height: 290px; position: relative;">
                   <canvas id="dashboardCategoryChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 2: Category Demand Volume Comparison Bar Chart -->
+          <div class="row g-4 mb-4">
+            <div class="col-12">
+              <div class="content-card">
+                <div class="card-header-flex">
+                  <div>
+                    <h5 class="mb-1">Cut Inventory vs Velocity Analysis</h5>
+                    <div class="text-muted small">Stock balance in cold storage vs sales rate by category</div>
+                  </div>
+                  <span class="badge bg-success-subtle text-success border border-success">Cold Chain Monitored</span>
+                </div>
+                <div style="height: 260px;">
+                  <canvas id="dashboardVolumeBarChart"></canvas>
                 </div>
               </div>
             </div>
@@ -419,7 +592,7 @@
                 </div>
                 <div class="cart-summary-line">
                   <span class="text-primary cursor-pointer" onclick="PosModule.promptDiscount()">
-                    <i class="bi bi-tag-fill me-1"></i> Discount (-):
+                    <i class="bi bi-tag-fill me-1"></i> Discount (&minus;):
                   </span>
                   <span class="mono-num text-primary" id="cart-discount">₹0.00</span>
                 </div>
@@ -926,10 +1099,10 @@
               <div class="content-card">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <h5 class="mb-0">Supabase PostgreSQL Integration</h5>
-                  <span id="supabase-status-badge" class="badge bg-secondary">LOCAL PERSISTENT ENGINE</span>
+                  <span id="supabase-status-badge" class="badge bg-success">SUPABASE CLOUD CONNECTED</span>
                 </div>
                 <p class="small text-muted mb-3">
-                  The system operates in dual-mode: you can link your live Supabase project by providing the URL and anon/service key below, or keep using the zero-config local engine.
+                  Connected directly to Supabase cloud instance (PostgreSQL 17.12) with Row Level Security (RLS) policies and automated migrations.
                 </p>
 
                 <div class="mb-3">
@@ -1145,7 +1318,7 @@
             </div>
             <div class="col-md-8">
               <label class="form-label small fw-bold text-muted">Product Name:</label>
-              <input type="text" id="prod-form-name" class="form-control" placeholder="e.g. Tenderloin Steak Fillet">
+              <input type="text" id="prod-form-name" class="form-control" placeholder="e.g. Farm Fresh Chicken Breast">
             </div>
           </div>
           <div class="row g-3 mb-3">
@@ -1154,7 +1327,6 @@
               <select id="prod-form-category" class="form-select">
                 <option value="poultry">Poultry</option>
                 <option value="mutton">Mutton & Lamb</option>
-                <option value="beef">Prime Beef</option>
                 <option value="seafood">Seafood & Fish</option>
                 <option value="deli">Marinated & Deli</option>
               </select>
@@ -1188,6 +1360,11 @@
           <div class="mb-3">
             <label class="form-label small fw-bold text-muted">Product Description & Cut Guide:</label>
             <textarea id="prod-form-desc" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Product Image URL (High-Res Food Photography):</label>
+            <input type="url" id="prod-form-image" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+            <div class="form-text small text-muted">Direct image URL displayed on POS touch screen and inventory catalog.</div>
           </div>
         </div>
         <div class="modal-footer">

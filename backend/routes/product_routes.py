@@ -65,12 +65,16 @@ def create_product():
     min_stock_level = float(data.get('min_stock_level', 5.0))
     initial_stock = float(data.get('initial_stock', 0.0))
     description = data.get('description', '')
+    image_url = data.get('image_url', '').strip()
 
     if not name or not sku:
         return jsonify({'error': 'Product name and SKU are required.'}), 400
 
     if unit not in ('KG', 'PCS'):
         return jsonify({'error': 'Unit must be either KG or PCS.'}), 400
+
+    if category == 'beef' or 'beef' in name.lower():
+        return jsonify({'error': 'Beef products are not allowed in this system.'}), 400
 
     if Product.query.filter_by(sku=sku).first():
         return jsonify({'error': f'Product with SKU {sku} already exists.'}), 400
@@ -84,6 +88,7 @@ def create_product():
         cost_price=cost_price,
         min_stock_level=min_stock_level,
         description=description,
+        image_url=image_url,
         is_active=True
     )
     db.session.add(prod)
@@ -135,6 +140,8 @@ def update_product(product_id):
         prod.min_stock_level = float(data['min_stock_level'])
     if 'description' in data:
         prod.description = data['description']
+    if 'image_url' in data:
+        prod.image_url = data['image_url'].strip()
     if 'is_active' in data:
         prod.is_active = bool(data['is_active'])
 

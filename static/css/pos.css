@@ -84,19 +84,60 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  cursor: pointer;
 }
 
-.pos-card-header {
+.pos-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border-color: #f43f5e;
+}
+
+.pos-card-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 115px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 10px;
+  background-color: #f1f5f9;
+}
+
+.pos-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.pos-card:hover .pos-card-img {
+  transform: scale(1.08);
+}
+
+.pos-card-badges-overlay {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
+  align-items: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.pos-card-badges-overlay .badge {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.22);
+  backdrop-filter: blur(4px);
+  font-weight: 700;
+  font-size: 0.7rem;
 }
 
 .pos-prod-name {

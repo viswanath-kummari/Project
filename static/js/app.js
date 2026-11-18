@@ -1,11 +1,12 @@
 /* ==========================================================================
-   APPLICATION CONTROLLER & ROUTER
+   APPLICATION CONTROLLER, AUTHENTICATION GATEWAY & ROUTER
    Fresh Cut Meat Shop Management System
    ========================================================================== */
 
 const App = {
   currentView: 'dashboard',
   currentUser: null,
+  enteredPin: '',
   shopSettings: {
     name: 'Fresh Cut Artisanal Meat Co.',
     currency: '₹',
@@ -14,44 +15,139 @@ const App = {
   },
 
   async init() {
-    console.log('🥩 Initializing Fresh Cut Meat Shop App...');
+    console.log('[APP] Initializing Fresh Cut Meat Shop App...');
     
-    // Check existing auth or default auto-login to Admin for smooth demo
-    let user = Api.getUser();
-    if (!user || !Api.getToken()) {
-      await this.quickLogin('admin@freshcut.com', 'AdminPassword123!');
-    } else {
-      this.currentUser = user;
-    }
-
-    this.updateUserUI();
     this.setupEventListeners();
     await this.loadShopSettings();
 
-    // Default route
+    // Check existing authentication
+    const user = Api.getUser();
+    const token = Api.getToken();
+
+    if (user && token) {
+      this.currentUser = user;
+      this.showAppShell();
+    } else {
+      this.showLoginScreen();
+    }
+  },
+
+  showLoginScreen() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-wrapper').style.display = 'none';
+    this.resetPin();
+  },
+
+  showAppShell() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'flex';
+    this.updateUserUI();
+
     const hash = window.location.hash.replace('#', '') || 'dashboard';
     this.navigateTo(hash);
   },
 
-  async quickLogin(email, password, pin = null) {
+  async handleAdminLogin(e) {
+    if (e) e.preventDefault();
+    const email = document.getElementById('login-admin-email').value.trim();
+    const password = document.getElementById('login-admin-password').value;
+
+    if (!email || !password) {
+      this.showToast('Please enter administrator email and password.', 'warning');
+      return;
+    }
+
     try {
-      const payload = pin ? { pin } : { email, password };
-      const res = await Api.post('/auth/login', payload);
+      const res = await Api.post('/auth/login', { email, password });
       Api.setAuth(res.token, res.user);
       this.currentUser = res.user;
-      this.updateUserUI();
-      this.showToast(`Welcome back, ${res.user.full_name}! (${res.user.role.toUpperCase()})`, 'success');
-      this.navigateTo('dashboard');
+      this.showToast(`Welcome back, ${res.user.full_name}! (Owner/Admin)`, 'success');
+      this.showAppShell();
     } catch (err) {
       this.showToast(err.message, 'error');
     }
   },
 
+  // Interactive Touch PIN Keypad for Cashier / Staff
+  pinKeyPress(digit) {
+    if (this.enteredPin.length >= 4) return;
+    this.enteredPin += digit.toString();
+    this.updatePinDots();
+
+    if (this.enteredPin.length === 4) {
+      setTimeout(() => this.submitCashierPin(), 150);
+    }
+  },
+
+  pinBackspace() {
+    if (this.enteredPin.length > 0) {
+      this.enteredPin = this.enteredPin.slice(0, -1);
+      this.updatePinDots();
+    }
+  },
+
+  resetPin() {
+    this.enteredPin = '';
+    this.updatePinDots();
+  },
+
+  updatePinDots() {
+    for (let i = 1; i <= 4; i++) {
+      const dot = document.getElementById(`pin-dot-${i}`);
+      if (dot) {
+        dot.classList.toggle('filled', i <= this.enteredPin.length);
+      }
+    }
+  },
+
+  async submitCashierPin() {
+    if (this.enteredPin.length !== 4) {
+      this.showToast('Please enter your 4-digit employee PIN.', 'warning');
+      return;
+    }
+
+    try {
+      const res = await Api.post('/auth/login', { pin: this.enteredPin });
+      Api.setAuth(res.token, res.user);
+      this.currentUser = res.user;
+      this.showToast(`Welcome on shift, ${res.user.full_name}! (POS Counter)`, 'success');
+      this.showAppShell();
+    } catch (err) {
+      this.showToast(err.message, 'error');
+      this.resetPin();
+    }
+  },
+
+  // 1-Click Demo Quick Logins
+  async quickDemoLogin(role) {
+    if (role === 'admin') {
+      document.getElementById('login-admin-email').value = 'admin@freshcut.com';
+      document.getElementById('login-admin-password').value = 'AdminPassword123!';
+      await this.handleAdminLogin();
+    } else {
+      this.enteredPin = '5678';
+      this.updatePinDots();
+      await this.submitCashierPin();
+    }
+  },
+
+  async logout() {
+    try {
+      await Api.post('/auth/logout', {});
+    } catch (e) {
+      // Continue client cleanup even if network fails
+    }
+    Api.clearAuth();
+    this.currentUser = null;
+    this.showToast('You have been signed out safely.', 'info');
+    this.showLoginScreen();
+  },
+
   async switchRole(roleTarget) {
     if (roleTarget === 'admin') {
-      await this.quickLogin('admin@freshcut.com', 'AdminPassword123!');
+      await this.quickDemoLogin('admin');
     } else {
-      await this.quickLogin('cashier@freshcut.com', 'CashierPassword123!');
+      await this.quickDemoLogin('employee');
     }
   },
 
@@ -91,8 +187,16 @@ const App = {
   setupEventListeners() {
     // Hash change router
     window.addEventListener('hashchange', () => {
-      const hash = window.location.hash.replace('#', '') || 'dashboard';
-      this.navigateTo(hash);
+      if (this.currentUser) {
+        const hash = window.location.hash.replace('#', '') || 'dashboard';
+        this.navigateTo(hash);
+      }
+    });
+
+    // Session expiry listener
+    window.addEventListener('auth:expired', () => {
+      this.showToast('Your session has expired. Please sign in again.', 'warning');
+      this.showLoginScreen();
     });
 
     // Sidebar navigation clicks
@@ -122,6 +226,26 @@ const App = {
         this.switchRole(role);
       });
     });
+  },
+
+  switchLoginTab(tab) {
+    const adminTab = document.getElementById('login-tab-admin');
+    const employeeTab = document.getElementById('login-tab-employee');
+    const adminPanel = document.getElementById('login-panel-admin');
+    const employeePanel = document.getElementById('login-panel-employee');
+
+    if (tab === 'admin') {
+      adminTab.classList.add('active');
+      employeeTab.classList.remove('active');
+      adminPanel.style.display = 'block';
+      employeePanel.style.display = 'none';
+    } else {
+      adminTab.classList.remove('active');
+      employeeTab.classList.add('active');
+      adminPanel.style.display = 'none';
+      employeePanel.style.display = 'block';
+      this.resetPin();
+    }
   },
 
   navigateTo(viewName) {

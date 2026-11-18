@@ -55,7 +55,6 @@ const PosModule = {
       { id: 'all', label: 'All Cuts', icon: 'bi-grid-fill' },
       { id: 'poultry', label: 'Poultry', icon: 'bi-egg-fill' },
       { id: 'mutton', label: 'Mutton & Lamb', icon: 'bi-fire' },
-      { id: 'beef', label: 'Prime Beef', icon: 'bi-shield-shaded' },
       { id: 'seafood', label: 'Seafood & Fish', icon: 'bi-water' },
       { id: 'deli', label: 'Marinated & Deli', icon: 'bi-stars' }
     ];
@@ -106,11 +105,17 @@ const PosModule = {
         ? `<span class="badge badge-out-of-stock">Out of Stock</span>`
         : (isLowStock ? `<span class="badge badge-low-stock pulse-alert">${p.current_stock} ${p.unit} left</span>` : `<span class="badge badge-in-stock">${p.current_stock} ${p.unit}</span>`);
 
+      const defaultImg = 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80';
+      const imgSrc = p.image_url || defaultImg;
+
       return `
         <div class="pos-card pos-product-card ${isOutOfStock ? 'opacity-50 pointer-events-none' : ''}" onclick="PosModule.addToCart('${p.id}')">
-          <div class="pos-card-header">
-            <span class="badge badge-${p.category}">${p.category.toUpperCase()}</span>
-            ${stockBadge}
+          <div class="pos-card-img-wrap">
+            <img src="${imgSrc}" alt="${p.name}" class="pos-card-img" loading="lazy" onerror="this.src='${defaultImg}'">
+            <div class="pos-card-badges-overlay">
+              <span class="badge badge-${p.category}">${p.category.toUpperCase()}</span>
+              ${stockBadge}
+            </div>
           </div>
           <div>
             <div class="pos-prod-name" title="${p.name}">${p.name}</div>
@@ -120,8 +125,8 @@ const PosModule = {
             <div class="pos-prod-price">
               ${App.shopSettings.currency}${p.selling_price.toFixed(2)}<small>/${p.unit}</small>
             </div>
-            <button class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px;" ${isOutOfStock ? 'disabled' : ''}>
-              <i class="bi bi-plus"></i>
+            <button class="btn btn-sm btn-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width:34px; height:34px;" ${isOutOfStock ? 'disabled' : ''}>
+              <i class="bi bi-plus-lg"></i>
             </button>
           </div>
         </div>

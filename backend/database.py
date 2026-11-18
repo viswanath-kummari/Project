@@ -76,7 +76,8 @@ def seed_database_if_empty():
             'selling_price': 340.00,
             'min_stock_level': 10.0,
             'initial_stock': 28.500,
-            'description': 'Tender, skinless and boneless chicken breast fillets, trimmed of excess fat.'
+            'description': 'Tender, skinless and boneless chicken breast fillets, trimmed of excess fat.',
+            'image_url': 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'CHK-CUR-02',
@@ -87,7 +88,8 @@ def seed_database_if_empty():
             'selling_price': 260.00,
             'min_stock_level': 15.0,
             'initial_stock': 42.000,
-            'description': 'Even bite-sized bone-in chicken cuts perfect for rich slow-cooked curries.'
+            'description': 'Even bite-sized bone-in chicken cuts perfect for rich slow-cooked curries.',
+            'image_url': 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'CHK-DRM-03',
@@ -98,7 +100,8 @@ def seed_database_if_empty():
             'selling_price': 295.00,
             'min_stock_level': 8.0,
             'initial_stock': 18.250,
-            'description': 'Juicy bone-in lower leg cuts, skinless and ready for tandoor or roasting.'
+            'description': 'Juicy bone-in lower leg cuts, skinless and ready for tandoor or roasting.',
+            'image_url': 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'CHK-WNG-04',
@@ -109,7 +112,8 @@ def seed_database_if_empty():
             'selling_price': 240.00,
             'min_stock_level': 5.0,
             'initial_stock': 4.500, # Low stock alert trigger
-            'description': 'Fresh chicken wingettes and drumettes, ideal for grilling and deep frying.'
+            'description': 'Fresh chicken wingettes and drumettes, ideal for grilling and deep frying.',
+            'image_url': 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'CHK-WHL-05',
@@ -120,7 +124,8 @@ def seed_database_if_empty():
             'selling_price': 280.00,
             'min_stock_level': 6.0,
             'initial_stock': 14.000,
-            'description': 'Plump whole spring chicken cleaned and gutted (approx 850g - 950g each).'
+            'description': 'Plump whole spring chicken cleaned and gutted (approx 850g - 950g each).',
+            'image_url': 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=400&q=80'
         },
         # Mutton & Lamb (KG)
         {
@@ -132,7 +137,8 @@ def seed_database_if_empty():
             'selling_price': 890.00,
             'min_stock_level': 10.0,
             'initial_stock': 24.750,
-            'description': 'Rich pasture-raised goat meat cuts including ribs, shoulder, and shank chunks.'
+            'description': 'Rich pasture-raised goat meat cuts including ribs, shoulder, and shank chunks.',
+            'image_url': 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'MUT-CHP-02',
@@ -143,7 +149,8 @@ def seed_database_if_empty():
             'selling_price': 1150.00,
             'min_stock_level': 5.0,
             'initial_stock': 8.200,
-            'description': 'Succulent bone-in lamb chops carefully trimmed for searing or gourmet braising.'
+            'description': 'Succulent bone-in lamb chops carefully trimmed for searing or gourmet braising.',
+            'image_url': 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'MUT-MNC-03',
@@ -154,7 +161,8 @@ def seed_database_if_empty():
             'selling_price': 940.00,
             'min_stock_level': 6.0,
             'initial_stock': 12.000,
-            'description': 'Double-ground lean goat leg meat for kebabs, samosas, and keema mattar.'
+            'description': 'Double-ground lean goat leg meat for kebabs, samosas, and keema mattar.',
+            'image_url': 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'MUT-LVR-04',
@@ -165,41 +173,8 @@ def seed_database_if_empty():
             'selling_price': 720.00,
             'min_stock_level': 4.0,
             'initial_stock': 3.100, # Low stock trigger
-            'description': 'Nutrient-rich smooth tender goat liver cut into clean pan-sear squares.'
-        },
-        # Beef & Veal (KG)
-        {
-            'sku': 'BEF-TLN-01',
-            'name': 'Prime Beef Tenderloin (Fillet Mignon)',
-            'category': 'beef',
-            'unit': 'KG',
-            'cost_price': 440.00,
-            'selling_price': 650.00,
-            'min_stock_level': 6.0,
-            'initial_stock': 11.500,
-            'description': 'The most tender muscle cut, melt-in-the-mouth texture with subtle marbling.'
-        },
-        {
-            'sku': 'BEF-RBY-02',
-            'name': 'Aged Beef Ribeye Steak Cuts',
-            'category': 'beef',
-            'unit': 'KG',
-            'cost_price': 420.00,
-            'selling_price': 620.00,
-            'min_stock_level': 5.0,
-            'initial_stock': 9.800,
-            'description': 'Richly marbled rib cut that bursts with robust savory juices on the griddle.'
-        },
-        {
-            'sku': 'BEF-CUR-03',
-            'name': 'Beef Chuck Stew & Curry Cubes',
-            'category': 'beef',
-            'unit': 'KG',
-            'cost_price': 310.00,
-            'selling_price': 450.00,
-            'min_stock_level': 10.0,
-            'initial_stock': 22.400,
-            'description': 'Slow-cooking beef chunks with balanced collagen that melts into rich gravy.'
+            'description': 'Nutrient-rich smooth tender goat liver cut into clean pan-sear squares.',
+            'image_url': 'https://images.unsplash.com/photo-1588347818036-558601350947?auto=format&fit=crop&w=400&q=80'
         },
         # Seafood & Fish (KG)
         {
@@ -211,7 +186,8 @@ def seed_database_if_empty():
             'selling_price': 850.00,
             'min_stock_level': 8.0,
             'initial_stock': 15.600,
-            'description': 'Sweet, plump coastal prawns tail-on, cleaned and deveined for easy cooking.'
+            'description': 'Sweet, plump coastal prawns tail-on, cleaned and deveined for easy cooking.',
+            'image_url': 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'SEA-SLM-02',
@@ -222,7 +198,8 @@ def seed_database_if_empty():
             'selling_price': 1650.00,
             'min_stock_level': 4.0,
             'initial_stock': 6.200,
-            'description': 'Omega-3 rich sashimi-grade pink salmon with crisp skin and buttery flakes.'
+            'description': 'Omega-3 rich sashimi-grade pink salmon with crisp skin and buttery flakes.',
+            'image_url': 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'SEA-SUR-03',
@@ -233,7 +210,8 @@ def seed_database_if_empty():
             'selling_price': 990.00,
             'min_stock_level': 6.0,
             'initial_stock': 1.800, # Low stock alert
-            'description': 'Center-cut firm meaty steaks with a single central bone, perfect for rava fry.'
+            'description': 'Center-cut firm meaty steaks with a single central bone, perfect for rava fry.',
+            'image_url': 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=400&q=80'
         },
         # Delicatessen & Marinated (KG & PCS)
         {
@@ -245,7 +223,8 @@ def seed_database_if_empty():
             'selling_price': 420.00,
             'min_stock_level': 5.0,
             'initial_stock': 14.200,
-            'description': 'Boneless chicken cubes steeped in thick hung yogurt, mustard oil, and Kashmiri spices.'
+            'description': 'Boneless chicken cubes steeped in thick hung yogurt, mustard oil, and Kashmiri spices.',
+            'image_url': 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=400&q=80'
         },
         {
             'sku': 'DEL-SAS-02',
@@ -256,7 +235,8 @@ def seed_database_if_empty():
             'selling_price': 220.00,
             'min_stock_level': 10.0,
             'initial_stock': 25.000,
-            'description': 'Naturally smoked beechwood chicken sausages with fresh cracked black pepper.'
+            'description': 'Naturally smoked beechwood chicken sausages with fresh cracked black pepper.',
+            'image_url': 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=400&q=80'
         }
     ]
 
@@ -355,7 +335,7 @@ def seed_database_if_empty():
             total_spent=2890.00,
             loyalty_points=80,
             pending_balance=0.00,
-            notes='Weekend grill enthusiast. Loves ribeyes and lamb chops.'
+            notes='Weekend grill enthusiast. Loves salmon fillets and lamb chops.'
         ),
         Customer(
             name='Pooja Deshmukh',
@@ -395,7 +375,7 @@ def seed_database_if_empty():
             'created_at': today - timedelta(hours=2, minutes=30),
             'items': [
                 {'sku': 'MUT-CHP-02', 'qty': 1.200}, # 1.200 KG @ 1150 = 1380.00
-                {'sku': 'BEF-RBY-02', 'qty': 0.850}  # 0.850 KG @ 620 = 527.00
+                {'sku': 'SEA-SLM-02', 'qty': 0.850}  # 0.850 KG @ 1650 = 1402.50
             ],
             'discount': 50.00
         },
