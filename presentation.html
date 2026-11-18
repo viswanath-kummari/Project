@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Cut Meat Shop Management System - Project Presentation</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #881337;
+            --primary-light: #9f1239;
+            --accent: #f43f5e;
+            --emerald: #059669;
+            --emerald-light: #10b981;
+            --amber: #d97706;
+            --dark-bg: #0b0f19;
+            --card-bg: #111827;
+            --card-border: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --text-sub: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* Top Bar */
+        .top-nav {
+            height: 60px;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
+        }
+
+        .deck-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #374151;
+            color: white;
+            border-color: #4b5563;
+        }
+
+        .nav-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .nav-btn.primary:hover {
+            background: var(--primary-light);
+        }
+
+        /* Slide Deck Container */
+        .slide-deck {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 3rem;
+        }
+
+        .slide {
+            position: absolute;
+            top: 2rem;
+            bottom: 2rem;
+            left: 3rem;
+            right: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: radial-gradient(circle at top right, rgba(136, 19, 55, 0.15), transparent 45%),
+                        radial-gradient(circle at bottom left, rgba(5, 150, 105, 0.1), transparent 40%),
+                        var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3.5rem 4rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.97) translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Slide Content Typography */
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #fda4af;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            align-self: flex-start;
+        }
+
+        .slide-title {
+            font-size: 2.75rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.15;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #ffffff 40%, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 2.5rem;
+            max-width: 900px;
+        }
+
+        /* Grids & Cards */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            flex: 1;
+        }
+
+        .card {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(55, 65, 81, 0.8);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(244, 63, 94, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-icon.crimson { background: rgba(244, 63, 94, 0.2); color: #fda4af; }
+        .card-icon.emerald { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .card-icon.amber { background: rgba(245, 158, 11, 0.2); color: #fde68a; }
+        .card-icon.blue { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .card-icon.purple { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f3f4f6;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .tech-pill {
+            padding: 4px 10px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Stat Counter Box */
+        .stat-box {
+            background: linear-gradient(135deg, rgba(31, 41, 55, 0.6), rgba(17, 24, 39, 0.8));
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: #f43f5e;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+        }
+
+        /* Speaker Note Box */
+        .speaker-note-box {
+            margin-top: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            background: rgba(17, 24, 39, 0.8);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            font-size: 0.9rem;
+            color: #d1d5db;
+            line-height: 1.5;
+        }
+
+        .speaker-note-box strong {
+            color: #fda4af;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Bottom Status Bar */
+        .bottom-bar {
+            height: 48px;
+            background: rgba(17, 24, 39, 0.9);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        .progress-bar-container {
+            width: 250px;
+            height: 6px;
+            background: #1f2937;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 8%;
+            transition: width 0.3s ease;
+        }
+
+        /* Print Mode */
+        @media print {
+            body {
+                overflow: visible !important;
+                height: auto !important;
+                background: white !important;
+                color: black !important;
+            }
+            .top-nav, .bottom-bar {
+                display: none !important;
+            }
+            .slide-deck {
+                display: block !important;
+                padding: 0 !important;
+            }
+            .slide {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                right: auto !important;
+                bottom: auto !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                margin-bottom: 2rem !important;
+                border: 1px solid #ccc !important;
+                background: white !important;
+                color: black !important;
+            }
+            .slide-title {
+                color: #881337 !important;
+                -webkit-text-fill-color: #881337 !important;
+            }
+            .card {
+                background: #f8fafc !important;
+                border-color: #e2e8f0 !important;
+                color: black !important;
+            }
+            .card-title, .card-desc {
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-drumstick-bite"></i>
+            </div>
+            <div>
+                <span>FRESH CUT</span>
+                <span style="font-weight: 400; color: #9ca3af; font-size: 0.9rem; margin-left: 8px;">Meat Shop Management System</span>
+            </div>
+        </div>
+
+        <div class="deck-controls">
+            <button class="nav-btn" onclick="prevSlide()" title="Previous Slide (Left Arrow)">
+                <i class="fa-solid fa-arrow-left"></i> Prev
+            </button>
+            <button class="nav-btn" onclick="nextSlide()" title="Next Slide (Right Arrow, Space)">
+                Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="nav-btn" onclick="toggleFullScreen()" title="Full Screen (F)">
+                <i class="fa-solid fa-expand"></i> Fullscreen
+            </button>
+            <button class="nav-btn primary" onclick="window.print()" title="Print Slides or Save as PDF (Ctrl+P)">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+    </header>
+
+    <!-- Slide Deck Main Stage -->
+    <main class="slide-deck">
+
+        <!-- SLIDE 1: Title Slide -->
+        <section class="slide active" id="slide-1">
+            <span class="slide-tag"><i class="fa-solid fa-star"></i> Project Presentation & Architecture</span>
+            <h1 class="slide-title">FRESH CUT – Meat Shop Management System</h1>
+            <p class="slide-subtitle">A Next-Generation Commercial Cloud POS, Weight-Based Inventory Engine, and Automated Spoilage Control Platform</p>
+            
+            <div class="grid-3" style="margin-top: 1rem;">
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <div class="card-icon crimson"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="card-title">Viswanath</div>
+                    <div class="card-desc">Store Owner, System Administrator & Project Architect</div>
+                    <div class="badge-list">
+                        <span class="tech-pill">Admin Role</span>
+                        <span class="tech-pill">Lead Creator</span>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--emerald);">
+                    <div class="card-icon emerald"><i class="fa-solid fa-cash-register"></i></div>
+                    <div class="card-title">Hemanth</div>
+                    <div class="card-desc">Lead Cashier & Touch POS Operator (PIN: 5678)</div>
+                    <div class="badge-list">
+                        <span class="tech-pill">Cashier Role</span>
+                        <span class="tech-pill">Shift POS Lead</span>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--blue);">
+                    <div class="card-icon blue"><i class="fa-solid fa-cloud-bolt"></i></div>
+                    <div class="card-title">Tech & Infrastructure</div>
+                    <div class="card-desc">Python Flask, Supabase Cloud PostgreSQL, Vercel Serverless, Chart.js</div>
+                    <div class="badge-list">
+                        <span class="tech-pill">Live on Vercel</span>
+                        <span class="tech-pill">GitHub CI/CD</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Hello everyone. Today I am proud to present FRESH CUT, an enterprise-grade cloud management and high-speed POS software engineered specifically for the fresh meat, poultry, and seafood retail sector. I am Viswanath, the project architect and administrator, working alongside Hemanth as our lead POS cashier."
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Industry Problem Statement -->
+        <section class="slide" id="slide-2">
+            <span class="slide-tag"><i class="fa-solid fa-triangle-exclamation"></i> The Problem Statement</span>
+            <h1 class="slide-title">Why Traditional Retail Software Fails Meat Shops</h1>
+            <p class="slide-subtitle">Butcher shops operate on perishable goods, continuous weight variations, and rapid price fluctuations that standard supermarket software cannot handle.</p>
+
+            <div class="grid-4">
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-weight-scale"></i></div>
+                    <div class="card-title">Decimal Weights vs Piece Counts</div>
+                    <div class="card-desc">Generic POS software only counts items in integers. Meat shops sell cuts in fractional decimals (e.g. 1.345 kg) alongside whole items (e.g. 30 eggs).</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon amber"><i class="fa-solid fa-trash-can"></i></div>
+                    <div class="card-title">Spoilage & Trimming Wastage</div>
+                    <div class="card-desc">De-boning, fat trimming, and cold-chain fluctuations cause 5%–12% unrecorded shrinkage, silently wiping out retailer profit margins.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon blue"><i class="fa-solid fa-stopwatch-20"></i></div>
+                    <div class="card-title">Long Peak-Hour Counter Queues</div>
+                    <div class="card-desc">Sunday morning rushes require 10-second checkout speeds. Complex billing interfaces create bottlenecks and impatient customer drop-offs.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon purple"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="card-title">Catalog Compliance & Auditing</div>
+                    <div class="card-desc">Strict regional dietary compliance demands guaranteed isolation (e.g. zero-beef catalog adherence) and rigorous cashier audit logs.</div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Traditional POS and ERP platforms are built for packaged groceries. Meat shops face three unique hurdles: fractional decimal weights, high shrinkage from carcass trimming and cold-chain shelf-life, and extreme Sunday morning counter traffic. FRESH CUT was purpose-built to conquer every one of these pain points."
+            </div>
+        </section>
+
+        <!-- SLIDE 3: The Solution -->
+        <section class="slide" id="slide-3">
+            <span class="slide-tag"><i class="fa-solid fa-lightbulb"></i> The Fresh Cut Solution</span>
+            <h1 class="slide-title">Unified POS, Inventory & Analytics Engine</h1>
+            <p class="slide-subtitle">A high-speed touch terminal backed by transactional PostgreSQL inventory decrement and automated financial reporting.</p>
+
+            <div class="grid-3">
+                <div class="card" style="border-top: 4px solid var(--accent);">
+                    <div class="card-icon crimson"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="card-title">High-Speed Touch Billing</div>
+                    <div class="card-desc">1-Click quick scale dial buttons (+0.25kg, +0.5kg, +1.0kg), barcode search, simulated UPI QR code generator, and 80mm thermal receipt printing in under 8 seconds.</div>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--emerald);">
+                    <div class="card-icon emerald"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <div class="card-title">Stock Intake & Spoilage Auditing</div>
+                    <div class="card-desc">Atomic inventory decrement upon checkout, real-time +Add Stock intake modal with quick preset chips, and mandatory 4-reason wastage logging.</div>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--blue);">
+                    <div class="card-icon blue"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="card-title">Real-Time P&L & Analytics</div>
+                    <div class="card-desc">Dynamic Profit & Loss dashboard calculating Revenue &minus; COGS &minus; Spoilage = EBITDA, with Chart.js visualizations and 1-click Excel/PDF exports.</div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Our solution provides a unified control center: a touch-first POS for rapid checkouts, an atomic inventory movement ledger that prevents negative stock and tracks shrinkage, and an automated Profit & Loss dashboard that updates instantaneously as sales are rung up."
+            </div>
+        </section>
+
+        <!-- SLIDE 4: System Architecture -->
+        <section class="slide" id="slide-4">
+            <span class="slide-tag"><i class="fa-solid fa-sitemap"></i> System Architecture</span>
+            <h1 class="slide-title">End-to-End Enterprise Cloud Architecture</h1>
+            <p class="slide-subtitle">Separation of concerns across frontend presentation, REST API business logic, and cloud database persistence.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-desktop"></i></div>
+                    <div class="card-title">1. Presentation Tier (Client)</div>
+                    <div class="card-desc">
+                        • HTML5, CSS3, Bootstrap 5 UI<br>
+                        • Butcher Crimson & Obsidian Theme<br>
+                        • Chart.js Interactive Visualizations<br>
+                        • Touch PIN Keypad & Virtual Scale<br>
+                        • Ready for iOS / Android Mobile Apps
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-gears"></i></div>
+                    <div class="card-title">2. Application Tier (Flask API)</div>
+                    <div class="card-desc">
+                        • Python Flask WSGI REST Framework<br>
+                        • Vercel Serverless Gateway (`api/index.py`)<br>
+                        • SQLAlchemy ORM Data Layer<br>
+                        • RBAC Security & JWT Authorization<br>
+                        • Pandas Sales & Financial Aggregation
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon blue"><i class="fa-solid fa-database"></i></div>
+                    <div class="card-title">3. Database Tier (Supabase)</div>
+                    <div class="card-desc">
+                        • Managed Supabase Cloud PostgreSQL<br>
+                        • Connection Pooling (`pool_pre_ping`)<br>
+                        • Atomic Stock Decrement Transactions<br>
+                        • Zero-Beef Catalog Enforcement<br>
+                        • Audit Trail for Spoilage & Intake
+                    </div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "From an architectural standpoint, the system is divided into three scalable tiers: a responsive, mobile-ready HTML5/Bootstrap frontend, a high-throughput Python Flask serverless REST API deployed on Vercel, and a cloud-hosted Supabase PostgreSQL database equipped with connection pooling and atomic transactional guarantees."
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Tech Stack -->
+        <section class="slide" id="slide-5">
+            <span class="slide-tag"><i class="fa-solid fa-code"></i> Technology Stack</span>
+            <h1 class="slide-title">Modern, Reliable & Scalable Technologies</h1>
+            <p class="slide-subtitle">Selected for ultra-fast performance, zero software licensing costs, and seamless cloud deployment.</p>
+
+            <div class="grid-4">
+                <div class="stat-box">
+                    <div class="stat-num" style="color: #60a5fa;"><i class="fa-brands fa-python"></i></div>
+                    <div class="stat-label">Python Flask</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">Lightweight, high-speed RESTful API backend</div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-num" style="color: #34d399;"><i class="fa-solid fa-database"></i></div>
+                    <div class="stat-label">Supabase PostgreSQL</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">Enterprise ACID transactions & RLS security</div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-num" style="color: #f87171;"><i class="fa-brands fa-bootstrap"></i></div>
+                    <div class="stat-label">Bootstrap 5 & Vanilla JS</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">Zero heavy bundlers, instant 60fps load times</div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-num" style="color: #c084fc;"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="stat-label">Chart.js & Pandas</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">Real-time business telemetry & data processing</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem;">
+                <div class="card-title"><i class="fa-solid fa-diagram-project"></i> Deployment & Tooling Pipeline</div>
+                <div class="badge-list" style="margin-top: 0.5rem;">
+                    <span class="tech-pill">Vercel Serverless</span>
+                    <span class="tech-pill">GitHub Actions CI/CD</span>
+                    <span class="tech-pill">psycopg2-binary</span>
+                    <span class="tech-pill">SQLAlchemy 2.0</span>
+                    <span class="tech-pill">Gunicorn WSGI</span>
+                    <span class="tech-pill">ReportLab (PDF Receipts)</span>
+                    <span class="tech-pill">FontAwesome 6 Pro</span>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "We intentionally chose a lean, robust tech stack: Python Flask provides rock-solid backend endpoints, Supabase PostgreSQL ensures data integrity and cloud availability, and clean Bootstrap 5 with Chart.js guarantees lightning-fast counter rendering without JavaScript framework bloat."
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Touch POS Billing Features -->
+        <section class="slide" id="slide-6">
+            <span class="slide-tag"><i class="fa-solid fa-calculator"></i> Module 1: High-Speed POS</span>
+            <h1 class="slide-title">Built for Butcher Counter High-Traffic Rushes</h1>
+            <p class="slide-subtitle">Precision dual-unit billing (KG decimals & Piece counts) with multi-tender payment processing.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <div class="card-title">Dual Unit Logic</div>
+                    <div class="card-desc">
+                        • <strong>KG Weight Items</strong>: Support precise 3-decimal values (e.g. 1.250 kg Chicken Breast).<br>
+                        • <strong>Piece Items</strong>: Whole number quantities for eggs, whole crabs, and quail.<br>
+                        • Quick dial buttons (+0.25kg, +0.5kg, +1.0kg) for single-tap cart updates.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-qrcode"></i></div>
+                    <div class="card-title">Multi-Tender Payments</div>
+                    <div class="card-desc">
+                        • <strong>Cash</strong>: Tendered amount input with instant change calculation.<br>
+                        • <strong>UPI / QR Code</strong>: Interactive dynamic payment modal with sound cue.<br>
+                        • <strong>Card & Credit</strong>: Supports customer accounts and split bills.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon blue"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="card-title">Thermal Receipt Engine</div>
+                    <div class="card-desc">
+                        • Formatted for standard 80mm & 58mm thermal printers.<br>
+                        • Displays Store Name, Viswanath (Admin), Hemanth (Cashier), itemized weights, tax breakdown, and QR verification.
+                    </div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Our POS billing counter was designed for maximum speed. Hemanth can select an item, tap the quick dial weight chips, review the live tax calculation, accept cash or UPI via dynamic QR codes, and trigger a formatted 80mm thermal receipt in under 8 seconds."
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Inventory & Stock Intake -->
+        <section class="slide" id="slide-7">
+            <span class="slide-tag"><i class="fa-solid fa-warehouse"></i> Module 2: Inventory Control</span>
+            <h1 class="slide-title">Stock Intake & Automated Shrinkage Control</h1>
+            <p class="slide-subtitle">Prevents negative stock, records wholesale intake, and forces accountability on meat trimming loss.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon amber"><i class="fa-solid fa-circle-plus"></i></div>
+                    <div class="card-title">+ Add Stock Intake Modal</div>
+                    <div class="card-desc">
+                        • Dedicated stock increment modal with quick presets: <code>+0.5 kg</code> to <code>+50 kg</code> or <code>+5</code> to <code>+100 pcs</code>.<br>
+                        • Live projected balance box shows existing stock, incoming delivery, and new balance before committing.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-bone"></i></div>
+                    <div class="card-title">Spoilage Audit Logging</div>
+                    <div class="card-desc">
+                        • Mandatory loss categorization: <em>Trimming Loss, De-boning Scrap, Cold-Chain Fluctuation, Shelf Expiry</em>.<br>
+                        • Links wasted weight directly to cost price to deduct from gross profit automatically.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                    <div class="card-title">Real-Time Movement Ledger</div>
+                    <div class="card-desc">
+                        • Every transaction (Sale, Intake, Spoilage, Manual Adjustment) is permanently logged in the movement ledger with timestamp, user ID, and batch reference.
+                    </div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Inventory control is where meat shops either thrive or lose money. We introduced an intuitive '+ Add Stock' intake modal that lets managers increment inventory in seconds, while our spoilage logger requires cashiers to categorize meat waste so shrinkage is never hidden."
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Authentication & RBAC -->
+        <section class="slide" id="slide-8">
+            <span class="slide-tag"><i class="fa-solid fa-lock"></i> Module 3: Security & RBAC</span>
+            <h1 class="slide-title">Role-Based Access Control & Dual Login</h1>
+            <p class="slide-subtitle">Granular privileges separating administrative oversight from cashier billing counters.</p>
+
+            <div class="grid-2">
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-user-gear"></i> Viswanath (Store Owner / Admin)</span>
+                        <span class="tech-pill" style="color: #fda4af;">FULL PRIVILEGES</span>
+                    </div>
+                    <div class="card-desc">
+                        • Master catalog management (Add/Edit products, pricing, stock).<br>
+                        • Spoilage review & staff user account creation.<br>
+                        • Complete Financials: Sales Revenue, COGS, Net Profit (EBITDA), Spoilage impact.<br>
+                        • System settings, database connectivity, and 1-click Excel/PDF report generation.
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--emerald);">
+                    <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-user-check"></i> Hemanth (Lead Cashier)</span>
+                        <span class="tech-pill" style="color: #6ee7b7;">CASHIER PRIVILEGES</span>
+                    </div>
+                    <div class="card-desc">
+                        • High-speed touch PIN keypad authentication (PIN: <code>5678</code>).<br>
+                        • Fast POS billing counter, active product catalog, and weight dials.<br>
+                        • Read-only access to current available stock.<br>
+                        • Blocked from P&L, operating expenses, staff management, and system settings.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem;">
+                <div class="card-title"><i class="fa-solid fa-user-plus"></i> Self-Service Customer Registration</div>
+                <div class="card-desc">
+                    In addition to Owner and Cashier logins, the application includes a public <strong>Sign Up / Registration</strong> portal where new customers or staff can register and receive an immediate authenticated JWT session.
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Security is enforced at both the UI and backend API layers. Viswanath has complete master oversight of profit margins and catalog rules, while Hemanth logs in through a fast 4-digit touch keypad designed for quick shift handovers, with unauthorized routes strictly returning HTTP 403 Forbidden."
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Visualizations & Analytics -->
+        <section class="slide" id="slide-9">
+            <span class="slide-tag"><i class="fa-solid fa-chart-column"></i> Module 4: BI Analytics</span>
+            <h1 class="slide-title">Actionable Telemetry & Financial Insights</h1>
+            <p class="slide-subtitle">Transforming daily counter transactions into executive-level financial intelligence.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-chart-area"></i></div>
+                    <div class="card-title">Daily Sales Velocity</div>
+                    <div class="card-desc">Interactive 7-day and 30-day Chart.js line charts tracking peak sales hours, counter velocity, and Sunday surge patterns.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="card-title">Category Revenue Share</div>
+                    <div class="card-desc">Doughnut visualizations showcasing percentage share of Chicken, Mutton, Country Chicken, and Fresh Seafood sales.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon amber"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <div class="card-title">True P&L Breakdown</div>
+                    <div class="card-desc">
+                        Formula: <strong>Gross Revenue &minus; Cost of Goods (COGS) &minus; Spoilage Loss &minus; Operating Overhead = Net Profit (EBITDA)</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "Our analytics module turns raw receipt data into visual intelligence. Viswanath can immediately see whether Chicken Curry Cut or Tender Mutton is driving the week's revenue, identify peak Sunday shopping hours, and review true net EBITDA after deducting wholesale purchase costs and spoilage."
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Strict Catalog Compliance -->
+        <section class="slide" id="slide-10">
+            <span class="slide-tag"><i class="fa-solid fa-shield-check"></i> Quality & Compliance</span>
+            <h1 class="slide-title">100% Zero-Beef Catalog & Authentic Media</h1>
+            <p class="slide-subtitle">Engineered specifically to respect regional market preferences and deliver a premium retail experience.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-ban"></i></div>
+                    <div class="card-title">Zero-Beef Compliance</div>
+                    <div class="card-desc">All beef products, seed items, and references were permanently removed from the Supabase PostgreSQL database, routes, and UI to ensure complete market alignment.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-image"></i></div>
+                    <div class="card-title">High-Resolution Meat Imagery</div>
+                    <div class="card-desc">Every product card features appetizing, high-resolution photography for fresh chicken cuts, tender mutton, country poultry, and sea fish cuts.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon blue"><i class="fa-solid fa-tags"></i></div>
+                    <div class="card-title">Strict Category Hierarchy</div>
+                    <div class="card-desc">Products are cleanly sorted into Chicken (Curry cut, Boneless, Wings), Mutton (Curry cut, Chops, Keema), Seafood (Prawns, Rohu, Pomfret), and Eggs.</div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "In accordance with our strict operational guidelines, the product catalog is 100% zero-beef compliant across database tables, backend routes, and UI components. Furthermore, every product card is paired with high-definition imagery and precise pricing per kilogram."
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Cloud Deployment & DevOps -->
+        <section class="slide" id="slide-11">
+            <span class="slide-tag"><i class="fa-solid fa-cloud-arrow-up"></i> DevOps & Deployment</span>
+            <h1 class="slide-title">Live Cloud Deployment & Vercel Pipeline</h1>
+            <p class="slide-subtitle">Continuous integration via GitHub connected directly to Vercel Serverless Functions and Supabase Cloud.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-brands fa-github"></i></div>
+                    <div class="card-title">GitHub Version Control</div>
+                    <div class="card-desc">
+                        • Repository: <code>viswanath-kummari/Project</code> on branch <code>main</code>.<br>
+                        • Automated push triggers instant Vercel redeployment.<br>
+                        • Comprehensive test suite (<code>test_system.py</code>) validating all 7 core subsystems.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-server"></i></div>
+                    <div class="card-title">Vercel Serverless Gateway</div>
+                    <div class="card-desc">
+                        • WSGI Entry Point: <code>api/index.py</code> handling all HTTP routes.<br>
+                        • <code>vercel.json</code> rewrites standardizing routing.<br>
+                        • Dynamic connection pooling to Supabase Cloud PostgreSQL with <code>pool_pre_ping</code> resilience.
+                    </div>
+                </div>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "The application is fully cloud-deployed. Our GitHub repository is integrated with Vercel's serverless infrastructure. Every commit automatically builds and deploys the application with zero downtime, connected to our managed Supabase cloud database with built-in connection recovery."
+            </div>
+        </section>
+
+        <!-- SLIDE 12: Future Roadmap & Conclusion -->
+        <section class="slide" id="slide-12">
+            <span class="slide-tag"><i class="fa-solid fa-flag-checkered"></i> Conclusion & Roadmap</span>
+            <h1 class="slide-title">Future Expansion & Project Summary</h1>
+            <p class="slide-subtitle">Ready for mobile app expansion, IoT scale integration, and enterprise multi-store franchising.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon blue"><i class="fa-solid fa-mobile-screen"></i></div>
+                    <div class="card-title">1. Android & iOS Apps</div>
+                    <div class="card-desc">Our RESTful API architecture is ready for React Native or Flutter mobile apps for remote owner monitoring and on-the-go billing.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon emerald"><i class="fa-solid fa-wifi"></i></div>
+                    <div class="card-title">2. IoT Bluetooth Scales</div>
+                    <div class="card-desc">Direct Web Bluetooth integration with digital weighing scales for automatic weight transmission without manual keyboard entry.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon crimson"><i class="fa-solid fa-shop"></i></div>
+                    <div class="card-title">3. Multi-Branch Franchising</div>
+                    <div class="card-desc">Centralized warehouse distribution, inter-branch stock transfers, and multi-store consolidated financial reporting.</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem; text-align: center; background: linear-gradient(135deg, rgba(136, 19, 55, 0.4), rgba(17, 24, 39, 0.8));">
+                <h3 style="font-size: 1.5rem; font-weight: 800; color: white; margin-bottom: 0.5rem;">Thank You! Any Questions?</h3>
+                <p style="color: #cbd5e1; font-size: 0.95rem;">Presented by <strong>Viswanath</strong> (Admin & Architect) and <strong>Hemanth</strong> (Cashier Lead)</p>
+            </div>
+
+            <div class="speaker-note-box">
+                <strong><i class="fa-solid fa-microphone-lines"></i> Presenter Script:</strong>
+                "To conclude: FRESH CUT solves real-world operational challenges in meat retailing by merging high-speed POS billing, precise dual-unit weight tracking, atomic inventory intake, and clear financial analytics. Thank you for your time, and we are now open to any questions!"
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <footer class="bottom-bar">
+        <div>
+            Slide <span id="current-slide-num" style="font-weight: 700; color: white;">1</span> of <span id="total-slides-num" style="font-weight: 700; color: white;">12</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <span style="font-size: 0.8rem; color: #6b7280;">Use &larr; &rarr; or Spacebar to navigate</span>
+        </div>
+
+        <div>
+            <span>Admin: <strong>Viswanath</strong> | Cashier: <strong>Hemanth</strong></span>
+        </div>
+    </footer>
+
+    <!-- Slide Deck Logic -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 12;
+
+        function updateSlideUI() {
+            document.querySelectorAll('.slide').forEach((slide, idx) => {
+                if (idx + 1 === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            document.getElementById('current-slide-num').innerText = currentSlide;
+            document.getElementById('total-slides-num').innerText = totalSlides;
+
+            const percentage = (currentSlide / totalSlides) * 100;
+            document.getElementById('progress-bar-fill').style.width = percentage + '%';
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.warn(`Fullscreen error: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullScreen();
+            } else if (e.key === 'Home') {
+                currentSlide = 1;
+                updateSlideUI();
+            } else if (e.key === 'End') {
+                currentSlide = totalSlides;
+                updateSlideUI();
+            }
+        });
+
+        // Initialize UI
+        updateSlideUI();
+    </script>
+</body>
+</html>
