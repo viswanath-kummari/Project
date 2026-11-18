@@ -54,6 +54,73 @@ def get_inventory():
         }
     })
 
+@inventory_bp.route('/increment', methods=['POST'])
+@token_required
+def increment_stock():
+    """Increment / Restock inventory for a meat cut with intake tracking"""
+    data = request.get_json() or {}
+    product_id = data.get('product_id')
+    try:
+        quantity = float(data.get('quantity', 0.0))
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Quantity must be a valid number.'}), 400
+
+    reason = data.get('reason', '').strip()
+    cost_price = data.get('cost_price')
+
+    if not product_id or quantity <= 0:
+        return jsonify({'error': 'Product and positive quantity are required to increment stock.'}), 400
+
+    inv = Inventory.query.filter_by(product_id=product_id).first_or_404()
+    prod = db.session.get(Product, product_id)
+
+    # Unit formatting
+    if prod.unit == 'PCS':
+        quantity = float(round(quantity))
+    else:
+        quantity = round(quantity, 3)
+
+    prev_stock = inv.current_stock
+    new_stock = round(prev_stock + quantity, 3)
+
+    inv.current_stock = new_stock
+    inv.last_restocked_at = datetime.now(timezone.utc)
+
+    # Optional cost price update if provided by admin
+    if cost_price and request.current_user.role == 'admin':
+        try:
+            prod.cost_price = round(float(cost_price), 2)
+        except (ValueError, TypeError):
+            pass
+
+    mov = StockMovement(
+        product_id=prod.id,
+        movement_type='PURCHASE',
+        quantity=quantity,
+        unit=prod.unit,
+        previous_stock=prev_stock,
+        new_stock=new_stock,
+        reference_id=f"INTAKE-{int(datetime.now().timestamp())}",
+        reason=reason or f"Stock intake delivery (+{quantity} {prod.unit})",
+        created_by=request.current_user.id
+    )
+    db.session.add(mov)
+    db.session.commit()
+
+    log_audit(request.current_user, 'STOCK_INCREMENTED', 'INVENTORY', {
+        'product': prod.name,
+        'sku': prod.sku,
+        'increment': quantity,
+        'previous': prev_stock,
+        'new': new_stock,
+        'reason': reason
+    })
+
+    return jsonify({
+        'message': f"Successfully added +{quantity} {prod.unit} to {prod.name}. New balance: {new_stock} {prod.unit}.",
+        'inventory': inv.to_dict()
+    })
+
 @inventory_bp.route('/adjustment', methods=['POST'])
 @admin_required
 def adjust_stock():
@@ -68,7 +135,7 @@ def adjust_stock():
         return jsonify({'error': 'Product and non-zero quantity are required.'}), 400
 
     inv = Inventory.query.filter_by(product_id=product_id).first_or_404()
-    prod = Product.query.get(product_id)
+    prod = db.session.get(Product, product_id)
 
     prev_stock = inv.current_stock
     new_stock = round(prev_stock + quantity, 3)
@@ -122,7 +189,7 @@ def record_wastage():
         return jsonify({'error': 'A detailed reason is mandatory when recording wastage or spoilage.'}), 400
 
     inv = Inventory.query.filter_by(product_id=product_id).first_or_404()
-    prod = Product.query.get(product_id)
+    prod = db.session.get(Product, product_id)
 
     prev_stock = inv.current_stock
     if prev_stock < quantity:

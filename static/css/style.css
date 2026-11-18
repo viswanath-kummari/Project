@@ -701,6 +701,71 @@ h1, h2, h3, h4, h5, .brand-font {
   color: #0f172a;
 }
 
+.btn-emerald {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+  transition: all var(--transition-fast);
+}
+
+.btn-emerald:hover {
+  background: linear-gradient(135deg, #047857, #059669);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+}
+
+.btn-outline-emerald {
+  color: #059669;
+  border: 1.5px solid #10b981;
+  background: #ecfdf5;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.btn-outline-emerald:hover {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+.increment-chip {
+  padding: 6px 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.increment-chip:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+  transform: translateY(-1px);
+}
+
+.increment-chip:active {
+  transform: translateY(0);
+}
+
+.projected-balance-box {
+  background: linear-gradient(135deg, #f0fdf4, #e6fffa);
+  border: 1.5px dashed #34d399;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+
 /* Modals */
 .modal-custom .modal-content {
   border-radius: var(--radius-xl);

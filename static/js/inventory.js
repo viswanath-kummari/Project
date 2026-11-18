@@ -84,12 +84,15 @@ const InventoryModule = {
           <td class="mono-num fw-semibold text-danger-emphasis">${App.formatCurrency(item.selling_price)}</td>
           <td>${badge}</td>
           <td class="text-end">
-            <div class="btn-group btn-group-sm">
-              <button class="btn btn-outline-danger" onclick="InventoryModule.openWastageModal('${item.product_id}', '${item.product_name}', '${item.unit}', ${item.current_stock})" title="Log Wastage / Spoilage">
-                <i class="bi bi-trash-fill"></i> Spoilage
+            <div class="d-flex align-items-center justify-content-end gap-1">
+              <button class="btn btn-outline-emerald btn-sm d-inline-flex align-items-center gap-1 shadow-xs" onclick="InventoryModule.openIncrementModal('${item.product_id}', '${item.product_name.replace(/'/g, "\\'")}', '${item.unit}', ${item.current_stock}, '${item.sku}')" title="Increment / Restock Stock">
+                <i class="bi bi-plus-lg"></i> <span class="d-none d-md-inline">Add Stock</span>
+              </button>
+              <button class="btn btn-outline-danger btn-sm" onclick="InventoryModule.openWastageModal('${item.product_id}', '${item.product_name.replace(/'/g, "\\'")}', '${item.unit}', ${item.current_stock})" title="Log Wastage / Spoilage">
+                <i class="bi bi-trash-fill"></i> <span class="d-none d-md-inline">Spoilage</span>
               </button>
               ${isAdmin ? `
-                <button class="btn btn-outline-secondary" onclick="InventoryModule.openAdjustmentModal('${item.product_id}', '${item.product_name}', '${item.unit}', ${item.current_stock})" title="Adjust Stock">
+                <button class="btn btn-outline-secondary btn-sm" onclick="InventoryModule.openAdjustmentModal('${item.product_id}', '${item.product_name.replace(/'/g, "\\'")}', '${item.unit}', ${item.current_stock})" title="Recount / Adjust Stock">
                   <i class="bi bi-sliders"></i>
                 </button>
               ` : ''}
@@ -138,14 +141,30 @@ const InventoryModule = {
     }
   },
 
-  populateProductSelects() {
+  async populateProductSelects() {
     const wastageSelect = document.getElementById('modal-wastage-product-id');
     const adjustSelect = document.getElementById('modal-adjust-product-id');
+    const incSelect = document.getElementById('modal-inc-product-id');
 
-    const options = this.inventoryItems.map(i => `<option value="${i.product_id}">${i.product_name} (${i.current_stock} ${i.unit})</option>`).join('');
+    const options = this.inventoryItems.map(i => `<option value="${i.product_id}">${i.product_name} (${i.current_stock.toFixed(i.unit === 'KG' ? 3 : 0)} ${i.unit})</option>`).join('');
 
     if (wastageSelect) wastageSelect.innerHTML = `<option value="">Select product...</option>${options}`;
     if (adjustSelect) adjustSelect.innerHTML = `<option value="">Select product...</option>${options}`;
+    if (incSelect) incSelect.innerHTML = `<option value="">Select meat cut to restock...</option>${options}`;
+
+    // Load suppliers for intake dropdown
+    try {
+      const supSelect = document.getElementById('modal-inc-supplier');
+      if (supSelect && (!supSelect.options || supSelect.options.length <= 1)) {
+        const res = await Api.get('/suppliers');
+        if (res && res.suppliers) {
+          const supOptions = res.suppliers.map(s => `<option value="${s.id}">${s.company_name}</option>`).join('');
+          supSelect.innerHTML = `<option value="">Direct Farm Intake / In-House</option>${supOptions}`;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not load suppliers for increment modal', e);
+    }
   },
 
   openWastageModal(productId = '', productName = '', unit = 'KG', curStock = 0) {
@@ -247,6 +266,161 @@ const InventoryModule = {
       bootstrap.Modal.getInstance(document.getElementById('invAdjustmentModal')).hide();
       qtyInput.value = '';
       reasonInput.value = '';
+      await this.load();
+    } catch (e) {
+      App.showToast(e.message, 'error');
+    }
+  },
+
+  openIncrementModal(productId = '', productName = '', unit = 'KG', curStock = 0, sku = '') {
+    const modalEl = document.getElementById('invIncrementModal');
+    if (!modalEl) return;
+
+    // Default to first item if none provided
+    if (!productId && this.inventoryItems.length > 0) {
+      const first = this.inventoryItems[0];
+      productId = first.product_id;
+      productName = first.product_name;
+      unit = first.unit;
+      curStock = first.current_stock;
+      sku = first.sku;
+    }
+
+    const selectEl = document.getElementById('modal-inc-product-id');
+    if (selectEl && productId) {
+      selectEl.value = productId;
+    }
+
+    this.setupIncrementProductView(productId, productName, unit, curStock, sku);
+
+    const qtyInput = document.getElementById('modal-inc-qty');
+    if (qtyInput) {
+      qtyInput.value = (unit === 'KG') ? '5.000' : '10';
+    }
+
+    this.updateProjectedStock();
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  },
+
+  setupIncrementProductView(productId, productName, unit, curStock, sku) {
+    const item = this.inventoryItems.find(i => i.product_id === productId);
+    if (item) {
+      unit = item.unit;
+      curStock = item.current_stock;
+      sku = item.sku;
+      productName = item.product_name;
+    }
+
+    const curStockEl = document.getElementById('modal-inc-cur-stock');
+    const skuBadge = document.getElementById('modal-inc-sku-badge');
+    const unitType = document.getElementById('modal-inc-unit-type');
+    const unitLabel = document.getElementById('modal-inc-unit-label');
+    const unitAddon = document.getElementById('modal-inc-unit-addon');
+    const presetsContainer = document.getElementById('modal-inc-presets-container');
+
+    if (curStockEl) curStockEl.textContent = `${curStock.toFixed(unit === 'KG' ? 3 : 0)} ${unit}`;
+    if (skuBadge) skuBadge.textContent = sku || 'CUT-SKU';
+    if (unitType) unitType.textContent = (unit === 'KG') ? 'Weighed Meat Cut (KG)' : 'Individual Unit (PCS)';
+    if (unitLabel) unitLabel.textContent = unit;
+    if (unitAddon) unitAddon.textContent = unit;
+
+    // Render presets based on KG or PCS
+    if (presetsContainer) {
+      const presets = (unit === 'KG')
+        ? [0.5, 1.0, 2.0, 5.0, 10.0, 25.0, 50.0]
+        : [5, 10, 15, 20, 50, 100];
+
+      presetsContainer.innerHTML = presets.map(val => `
+        <button type="button" class="increment-chip" onclick="InventoryModule.applyIncrementPreset(${val})">
+          +${val} ${unit}
+        </button>
+      `).join('');
+    }
+  },
+
+  onIncrementProductChange() {
+    const selectEl = document.getElementById('modal-inc-product-id');
+    const productId = selectEl ? selectEl.value : '';
+    if (!productId) return;
+
+    this.setupIncrementProductView(productId);
+    this.updateProjectedStock();
+  },
+
+  applyIncrementPreset(val) {
+    const qtyInput = document.getElementById('modal-inc-qty');
+    if (!qtyInput) return;
+
+    let currentInput = parseFloat(qtyInput.value) || 0;
+    qtyInput.value = (currentInput + val).toFixed(qtyInput.step === '1' ? 0 : 3);
+    this.updateProjectedStock();
+  },
+
+  clearIncrementQty() {
+    const qtyInput = document.getElementById('modal-inc-qty');
+    if (qtyInput) qtyInput.value = '';
+    this.updateProjectedStock();
+  },
+
+  updateProjectedStock() {
+    const selectEl = document.getElementById('modal-inc-product-id');
+    const qtyInput = document.getElementById('modal-inc-qty');
+    const projEl = document.getElementById('modal-inc-projected-stock');
+    const plusQtyEl = document.getElementById('modal-inc-plus-qty');
+
+    const productId = selectEl ? selectEl.value : '';
+    const item = this.inventoryItems.find(i => i.product_id === productId);
+    const cur = item ? item.current_stock : 0;
+    const unit = item ? item.unit : 'KG';
+
+    const inputQty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+    const projected = Math.max(0, cur + inputQty);
+
+    if (projEl) projEl.textContent = `${projected.toFixed(unit === 'KG' ? 3 : 0)} ${unit}`;
+    if (plusQtyEl) plusQtyEl.textContent = `${inputQty.toFixed(unit === 'KG' ? 3 : 0)} ${unit}`;
+  },
+
+  async submitIncrement() {
+    const selectEl = document.getElementById('modal-inc-product-id');
+    const qtyInput = document.getElementById('modal-inc-qty');
+    const supplierSelect = document.getElementById('modal-inc-supplier');
+    const costInput = document.getElementById('modal-inc-cost');
+    const reasonInput = document.getElementById('modal-inc-reason');
+
+    const productId = selectEl ? selectEl.value : '';
+    const quantity = parseFloat(qtyInput ? qtyInput.value : 0);
+    const supplierId = supplierSelect ? supplierSelect.value : '';
+    const costPrice = costInput ? parseFloat(costInput.value) : null;
+    const notes = reasonInput ? reasonInput.value.trim() : '';
+
+    if (!productId) {
+      App.showToast('Please select a meat cut to increment.', 'warning');
+      return;
+    }
+
+    if (isNaN(quantity) || quantity <= 0) {
+      App.showToast('Please enter a positive increment quantity.', 'warning');
+      return;
+    }
+
+    try {
+      const res = await Api.post('/inventory/increment', {
+        product_id: productId,
+        quantity: quantity,
+        supplier_id: supplierId || null,
+        cost_price: (!isNaN(costPrice) && costPrice > 0) ? costPrice : null,
+        reason: notes || 'Delivery intake stock increment'
+      });
+
+      App.showToast(res.message, 'success');
+      bootstrap.Modal.getInstance(document.getElementById('invIncrementModal')).hide();
+
+      if (qtyInput) qtyInput.value = '';
+      if (reasonInput) reasonInput.value = '';
+      if (costInput) costInput.value = '';
+
       await this.load();
     } catch (e) {
       App.showToast(e.message, 'error');

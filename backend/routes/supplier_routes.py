@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 from backend.models import db, Supplier, Purchase, PurchaseItem, Product, Inventory, StockMovement, Payment
-from backend.auth import admin_required, log_audit
+from backend.auth import token_required, admin_required, log_audit
 
 supplier_bp = Blueprint('suppliers', __name__, url_prefix='/api/suppliers')
 
 @supplier_bp.route('', methods=['GET'])
-@admin_required
+@token_required
 def get_suppliers():
     suppliers = Supplier.query.order_by(Supplier.company_name.asc()).all()
     return jsonify({'suppliers': [s.to_dict() for s in suppliers]})

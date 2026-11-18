@@ -59,14 +59,21 @@ const ProductsModule = {
         <td class="text-end">
           ${isAdmin ? `
             <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-success" onclick="App.navigate('inventory'); InventoryModule.openIncrementModal('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.unit}', ${p.current_stock || 0}, '${p.sku}')" title="Increment / Restock Stock">
+                <i class="bi bi-plus-lg"></i> +Stock
+              </button>
               <button class="btn btn-outline-secondary" onclick="ProductsModule.openEditModal('${p.id}')">
-                <i class="bi bi-pencil"></i> Edit
+                <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-outline-danger" onclick="ProductsModule.deleteProduct('${p.id}', '${p.name}')">
                 <i class="bi bi-trash"></i>
               </button>
             </div>
-          ` : `<span class="badge bg-light text-muted">View Only</span>`}
+          ` : `
+            <button class="btn btn-sm btn-outline-success" onclick="App.navigate('inventory'); InventoryModule.openIncrementModal('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.unit}', ${p.current_stock || 0}, '${p.sku}')" title="Increment / Restock Stock">
+              <i class="bi bi-plus-lg"></i> +Stock
+            </button>
+          `}
         </td>
       </tr>
     `}).join('');

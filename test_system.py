@@ -87,5 +87,39 @@ class FreshCutSystemTest(unittest.TestCase):
         pdf_res = self.client.get('/api/reports/export?type=pnl&format=pdf', headers=headers)
         self.assertEqual(pdf_res.status_code, 200)
 
+    def test_06_stock_increment(self):
+        login_res = self.client.post('/api/auth/login', json={'email': 'admin@freshcut.com', 'password': 'AdminPassword123!'})
+        token = login_res.get_json()['token']
+        headers = {'Authorization': f'Bearer {token}'}
+
+        # 1. Fetch current stock
+        inv_res = self.client.get('/api/inventory', headers=headers)
+        self.assertEqual(inv_res.status_code, 200)
+        items = inv_res.get_json()['inventory']
+        self.assertTrue(len(items) > 0)
+        target = items[0]
+        initial_stock = target['current_stock']
+
+        # 2. Increment stock by +15.500
+        increment_amount = 15.5 if target['unit'] == 'KG' else 15.0
+        inc_res = self.client.post('/api/inventory/increment', headers=headers, json={
+            'product_id': target['product_id'],
+            'quantity': increment_amount,
+            'reason': 'Fresh farm delivery intake test'
+        })
+        self.assertEqual(inc_res.status_code, 200)
+        inc_data = inc_res.get_json()
+        expected_new_stock = round(initial_stock + increment_amount, 3)
+        self.assertEqual(inc_data['inventory']['current_stock'], expected_new_stock)
+
+        # 3. Verify stock movements recorded the intake
+        mov_res = self.client.get(f"/api/inventory/movements?product_id={target['product_id']}&type=PURCHASE", headers=headers)
+        self.assertEqual(mov_res.status_code, 200)
+        movements = mov_res.get_json()['movements']
+        self.assertTrue(len(movements) > 0)
+        latest_mov = movements[0]
+        self.assertEqual(latest_mov['movement_type'], 'PURCHASE')
+        self.assertEqual(latest_mov['quantity'], increment_amount)
+
 if __name__ == '__main__':
     unittest.main()
