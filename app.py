@@ -14,8 +14,14 @@ from backend.routes.report_routes import report_bp
 from backend.routes.settings_routes import settings_bp
 from backend.routes.audit_routes import audit_bp
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 def create_app():
-    app = Flask(__name__, static_folder='static', template_folder='templates')
+    app = Flask(
+        __name__,
+        static_folder=os.path.join(BASE_DIR, 'static'),
+        template_folder=os.path.join(BASE_DIR, 'templates')
+    )
     app.config.from_object(Config)
 
     # Initialize Database
@@ -63,10 +69,13 @@ def create_app():
     def server_error(e):
         return jsonify({'error': 'Internal server error occurred'}), 500
 
-    # Auto-create tables & seed demo data
+    # Auto-create tables & seed demo data safely (tolerates serverless cold starts)
     with app.app_context():
-        db.create_all()
-        seed_database_if_empty()
+        try:
+            db.create_all()
+            seed_database_if_empty()
+        except Exception as e:
+            print(f"[WARN] Database initialization notice: {e}")
 
     return app
 

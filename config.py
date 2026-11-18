@@ -11,17 +11,28 @@ class Config:
     JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
     
     # Supabase Configuration
-    SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+    SUPABASE_URL = os.getenv("SUPABASE_URL", "https://hznrmvplqpgmgysizngt.supabase.co")
     SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
     SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     
-    # Database Configuration (Falls back to local SQLite if Supabase URL not provided)
-    DATABASE_URL = os.getenv("DATABASE_URL")
+    # Database Configuration (Defaults directly to live Supabase PostgreSQL)
+    DEFAULT_SUPABASE_URI = "postgresql://postgres:Viswanath%40321@db.hznrmvplqpgmgysizngt.supabase.co:5432/postgres"
+    DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_SUPABASE_URI)
     if not DATABASE_URL:
-        DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'freshcut.db')}"
+        DATABASE_URL = DEFAULT_SUPABASE_URI
+    
+    # Handle postgres:// vs postgresql:// dialect format for SQLAlchemy
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Serverless Connection Pooling
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
     
     # Business Defaults
     SHOP_NAME = os.getenv("SHOP_NAME", "Fresh Cut Artisanal Meat Co.")
